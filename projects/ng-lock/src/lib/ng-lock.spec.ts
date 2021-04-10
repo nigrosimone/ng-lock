@@ -191,6 +191,8 @@ class TestComponent4 {
 
     @ngLock({
         lockElementFunction: null,
+        lockClass: null,
+        returnLastResultWhenLocked: true,
         unlockTimeout: 1
     })
     onClick(e){
