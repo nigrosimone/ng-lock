@@ -245,6 +245,75 @@ describe('NgLock: 4', () => {
 
 
 
+
+
+
+describe('NgLock', () => {
+    it('Mounth 1', () => {
+        const _ngLock = ngLock();
+
+        let count = 0;
+
+        const descriptor = {
+            value: (x) => {
+                count++;
+                return count;
+            }
+        };
+
+        _ngLock(null, 'test', descriptor);
+
+        const el = document.createElement('DIV')
+
+        expect( descriptor.value(el) ).toBe(1);
+        expect( descriptor.value(el) ).toBe(undefined);
+    }); 
+
+    it('Mounth 2', () => {
+        const _ngLock = ngLock({maxCall: 2});
+
+        let count = 0;
+
+        const descriptor = {
+            value: (x) => {
+                count++;
+                return count;
+            }
+        };
+
+        _ngLock(null, 'test', descriptor);
+
+        const el = document.createElement('DIV')
+
+        expect( descriptor.value(el) ).toBe(1);
+        expect( descriptor.value(el) ).toBe(2);
+        expect( descriptor.value(el) ).toBe(undefined);
+    });
+
+    it('Mounth 2', () => {
+        const _ngLock = ngLock({maxCall: 2, returnLastResultWhenLocked: true});
+
+        let count = 0;
+
+        const descriptor = {
+            value: (x) => {
+                count++;
+                return count;
+            }
+        };
+
+        _ngLock(null, 'test', descriptor);
+
+        const el = document.createElement('DIV')
+
+        expect( descriptor.value(el) ).toBe(1);
+        expect( descriptor.value(el) ).toBe(2);
+        expect( descriptor.value(el) ).toBe(2);
+    });
+});
+
+
+
 describe('ngLockElementByTargetEventArgument', () => {
     it('Method without arguments', () => {
         const fn = ngLockElementByTargetEventArgument();
@@ -317,9 +386,13 @@ describe('ngLockElementByComponentProperty', () => {
         const fn = ngLockElementByComponentProperty('xxxxxxxxxxxxxxxxxxxxxxx');
         expect( function(){ fn({}, null); } ).toThrow(new Error("Property not found"));
     });
-    it('Property must be a HTMLElement or object with nativeElement (also HTMLElement)', () => {
+    it('Property not found', () => {
         const fn = ngLockElementByComponentProperty('test');
         expect( function(){ fn({test: null}, null); } ).toThrow(new Error("Property not found"));
+    });
+    it('Property must be a HTMLElement or object with nativeElement (also HTMLElement)', () => {
+        const fn = ngLockElementByComponentProperty('test');
+        expect( function(){ fn({test: {nativeElement: null}}, null); } ).toThrow(new Error("Property must be a HTMLElement or object with nativeElement (also HTMLElement)"));
     });
     it('Argument with el 1', () => {
         const el = document.createElement('DIV')
