@@ -62,11 +62,11 @@ export const ngLockElementByTargetEventArgument: NgLockElementFunction = (argsIn
             arg = args.find(arg => arg.target instanceof HTMLElement);
             if (arg) {
                 return arg.target;
-            } 
+            }
             arg = args.find(arg => arg instanceof HTMLElement);
             if (arg) {
                 return arg;
-            } 
+            }
             throw new Error('Argument not found');
         }
     }
