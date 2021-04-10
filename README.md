@@ -53,7 +53,7 @@ export class AppComponent {
 }
 ```
 
-## ngLock option
+## NgLock options
 
 There are some optional options can be injectet into the `@ngLock()` decorator. This is an example with the default configuration:
 
