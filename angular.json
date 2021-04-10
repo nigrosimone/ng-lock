@@ -1,0 +1,168 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "ng-lock": {
+      "projectType": "library",
+      "root": "projects/ng-lock",
+      "sourceRoot": "projects/ng-lock/src",
+      "prefix": "ng",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/ng-lock/tsconfig.lib.json",
+            "project": "projects/ng-lock/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ng-lock/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/ng-lock/src/test.ts",
+            "tsConfig": "projects/ng-lock/tsconfig.spec.json",
+            "karmaConfig": "projects/ng-lock/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/ng-lock/tsconfig.lib.json",
+              "projects/ng-lock/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "ng-lock-demo": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "sass"
+        }
+      },
+      "root": "projects/ng-lock-demo",
+      "sourceRoot": "projects/ng-lock-demo/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/ng-lock-demo",
+            "index": "projects/ng-lock-demo/src/index.html",
+            "main": "projects/ng-lock-demo/src/main.ts",
+            "polyfills": "projects/ng-lock-demo/src/polyfills.ts",
+            "tsConfig": "projects/ng-lock-demo/tsconfig.app.json",
+            "aot": true,
+            "assets": [
+              "projects/ng-lock-demo/src/favicon.ico",
+              "projects/ng-lock-demo/src/assets"
+            ],
+            "styles": [
+              "projects/ng-lock-demo/src/styles.sass"
+            ],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "projects/ng-lock-demo/src/environments/environment.ts",
+                  "with": "projects/ng-lock-demo/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "ng-lock-demo:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "ng-lock-demo:build:production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "ng-lock-demo:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/ng-lock-demo/src/test.ts",
+            "polyfills": "projects/ng-lock-demo/src/polyfills.ts",
+            "tsConfig": "projects/ng-lock-demo/tsconfig.spec.json",
+            "karmaConfig": "projects/ng-lock-demo/karma.conf.js",
+            "assets": [
+              "projects/ng-lock-demo/src/favicon.ico",
+              "projects/ng-lock-demo/src/assets"
+            ],
+            "styles": [
+              "projects/ng-lock-demo/src/styles.sass"
+            ],
+            "scripts": []
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/ng-lock-demo/tsconfig.app.json",
+              "projects/ng-lock-demo/tsconfig.spec.json",
+              "projects/ng-lock-demo/e2e/tsconfig.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        },
+        "e2e": {
+          "builder": "@angular-devkit/build-angular:protractor",
+          "options": {
+            "protractorConfig": "projects/ng-lock-demo/e2e/protractor.conf.js",
+            "devServerTarget": "ng-lock-demo:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "ng-lock-demo:serve:production"
+            }
+          }
+        }
+      }
+    }},
+  "defaultProject": "ng-lock"
+}
