@@ -9,12 +9,6 @@ This library expose a practical decorator that do it, in a simple way.
 
 See the [stackblitz demo](https://stackblitz.com/edit/demo-ng-lock?file=src%2Fapp%2Fapp.component.ts).
 
-## Features
-
-✅ Observable support<br>
-✅ Async pipe support<br>
-✅ NgModel support<br>
-
 ## Get Started
 
 *Step 1*: install `ng-lock`
@@ -113,7 +107,9 @@ The options are:
  - *debug*: if `true`, the decorator log into the console some info (default: `false`)
 
 
-Available *lockElementFunction* are:
+### Available lockElementFunction
+
+*ngLockElementByQuerySelector*
 
 ```ts
 /**
@@ -127,6 +123,8 @@ onClick(){
   // ...
 }
 ```
+
+*ngLockElementByTargetEventArgument*
 
 ```ts
 /**
@@ -142,6 +140,8 @@ onClick(event: MouseEvent){
   // ...
 }
 ```
+
+*ngLockElementByComponentProperty*
 
 ```ts
 /**
@@ -163,7 +163,7 @@ onClick(){
 
 Below there are some examples of use case.
 
-### Example: observable
+### Example: unlockTimeout
 
 Example of use with `unlockTimeout` option, eg.:
 
@@ -202,6 +202,7 @@ export class AppComponent {
   }
 }
 ```
+### Example: maxCall
 
 Example of use with `maxCall` option, eg.:
 
