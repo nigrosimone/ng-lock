@@ -1,6 +1,6 @@
 import { Component, DebugElement, ElementRef, ViewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ngLock, ngUnlock, ngLockElementByQuerySelector, ngLockElementByComponentProperty, ngLockElementByTargetEventArgument, NG_LOCK_LOCKED_CLASS } from './ng-lock.decorator';
+import { ngLock, ngUnlock, ngLockElementByQuerySelector, ngLockElementByComponentProperty, ngLockElementByTargetEventArgument, NG_LOCK_LOCKED_CLASS, ngUnlockCallback } from './ng-lock.decorator';
 
 async function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -193,7 +193,8 @@ class TestComponent4 {
         lockElementFunction: null,
         lockClass: null,
         returnLastResultWhenLocked: true,
-        unlockTimeout: 1
+        unlockTimeout: 1,
+        debug: true
     })
     onClick(e){
         this.value++;
@@ -269,6 +270,26 @@ describe('ngLockElementByTargetEventArgument', () => {
         const fn = ngLockElementByTargetEventArgument(0);
         expect( function(){ fn(null, [{target: true}]); } ).toThrow(new Error("Argument with target property but not an HTMLElement"));
     });
+    it('Argument with el 1', () => {
+        const el = document.createElement('DIV')
+        const fn = ngLockElementByTargetEventArgument(0);
+        expect( fn(null, [el]) ).toBe(el);
+    });
+    it('Argument with el 2', () => {
+        const el = document.createElement('DIV')
+        const fn = ngLockElementByTargetEventArgument(0);
+        expect( fn(null, [{target: el}]) ).toBe(el);
+    });
+    it('Argument with el 3', () => {
+        const el = document.createElement('DIV')
+        const fn = ngLockElementByTargetEventArgument();
+        expect( fn(null, [{target: el}]) ).toBe(el);
+    });
+    it('Argument with el 4', () => {
+        const el = document.createElement('DIV')
+        const fn = ngLockElementByTargetEventArgument();
+        expect( fn(null, [el]) ).toBe(el);
+    });
 });
 
 
@@ -280,6 +301,10 @@ describe('ngLockElementByQuerySelector', () => {
     it('Element not foun', () => {
         const fn = ngLockElementByQuerySelector('#xxxxxxxxxxxxxxxxxxxxxxx');
         expect( function(){ fn(null, null); } ).toThrow(new Error("Element not found"));
+    });
+    it('Argument with el', () => {
+        const fn = ngLockElementByQuerySelector('body');
+        expect( fn(null, null) ).toBe(document.querySelector('body'));
     });
 });
 
@@ -295,5 +320,26 @@ describe('ngLockElementByComponentProperty', () => {
     it('Property must be a HTMLElement or object with nativeElement (also HTMLElement)', () => {
         const fn = ngLockElementByComponentProperty('test');
         expect( function(){ fn({test: null}, null); } ).toThrow(new Error("Property not found"));
+    });
+    it('Argument with el 1', () => {
+        const el = document.createElement('DIV')
+        const fn = ngLockElementByComponentProperty('test');
+        expect( fn({test: el}, null) ).toBe(el);
+    });
+    it('Argument with el 2', () => {
+        const el = document.createElement('DIV')
+        const fn = ngLockElementByComponentProperty('test');
+        expect( fn({test: {nativeElement: el}}, null) ).toBe(el);
+    });
+});
+
+
+describe('ngUnlockCallback', () => {
+    it('"fn" param must be a function', () => {
+        expect( function(){ ngUnlockCallback(null); } ).toThrow(new Error('"fn" param must be a function.'));
+    });
+    it('"fn" param (function f) must be a @ngLock() decorated function.', () => {
+        let f = () => {};
+        expect( function(){ ngUnlockCallback(f); } ).toThrow(new Error('"fn" param (function f) must be a @ngLock() decorated function.'));
     });
 });

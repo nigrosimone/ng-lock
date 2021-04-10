@@ -39,30 +39,35 @@ export const ngLockElementByTargetEventArgument: NgLockElementFunction = (argsIn
             throw new Error('Method without arguments');
         }
         let arg: any;
-        if (argsIndex < 0) {
-            throw new Error('argsIndex muth be grater than or equal 0');
-        } else if (argsIndex >= 0) {
-            if (args.length - 1 < argsIndex) {
-                throw new Error('argsIndex grater than arguments length');
+        if (typeof argsIndex === 'number') {
+            if (argsIndex < 0) {
+                throw new Error('argsIndex muth be grater than or equal 0');
+            } else {
+                if (args.length - 1 < argsIndex) {
+                    throw new Error('argsIndex grater than arguments length');
+                }
+                arg = args[argsIndex];
+                if (arg instanceof HTMLElement) {
+                    return arg;
+                }
+                if (!arg.target) {
+                    throw new Error('Argument not a HTMLElement and without a target element');
+                }
+                if (!(arg.target instanceof HTMLElement)) {
+                    throw new Error('Argument with target property but not an HTMLElement');
+                }
+                return arg.target;
             }
-            arg = args[argsIndex];
-            if (arg instanceof HTMLElement) {
-                return arg;
-            }
-            if (!arg.target) {
-                throw new Error('Argument not a HTMLElement and without a target element');
-            }
-            if (!(arg.target instanceof HTMLElement)) {
-                throw new Error('Argument with target property but not an HTMLElement');
-            }
-            return arg.target;
         } else {
             arg = args.find(arg => arg.target instanceof HTMLElement);
             if (arg) {
                 return arg.target;
-            } else {
-                throw new Error('Argument not found');
-            }
+            } 
+            arg = args.find(arg => arg instanceof HTMLElement);
+            if (arg) {
+                return arg;
+            } 
+            throw new Error('Argument not found');
         }
     }
 };
