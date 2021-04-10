@@ -1,4 +1,5 @@
 export const NG_UNLOCK_CALLBACK = "ngUnlockCallback";
+export const NG_LOCK_LOCKED_CLASS = 'ng-lock-locked'
 
 export type NgLockDecoratedFunction = {
     [NG_UNLOCK_CALLBACK]?: () => void
@@ -119,7 +120,7 @@ export const NgLockDefaultOption: NgLockOption = {
     maxCall: 1,
     unlockTimeout: null,
     lockElementFunction: ngLockElementByTargetEventArgument(),
-    lockClass: 'ng-lock-locked',
+    lockClass: NG_LOCK_LOCKED_CLASS,
     returnLastResultWhenLocked: false,
     debug: false
 }
