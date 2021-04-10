@@ -241,3 +241,59 @@ describe('NgLock: 4', () => {
         done();
     });
 });
+
+
+
+describe('ngLockElementByTargetEventArgument', () => {
+    it('Method without arguments', () => {
+        const fn = ngLockElementByTargetEventArgument();
+        expect( function(){ fn(null, null); } ).toThrow(new Error("Method without arguments"));
+    }); 
+    it('Argument not found', () => {
+        const fn = ngLockElementByTargetEventArgument();
+        expect( function(){ fn(null, [{}]); } ).toThrow(new Error("Argument not found"));
+    });
+    it('argsIndex muth be grater than or equal 0', () => {
+        const fn = ngLockElementByTargetEventArgument(-1);
+        expect( function(){ fn(null, [{}]); } ).toThrow(new Error("argsIndex muth be grater than or equal 0"));
+    });
+    it('argsIndex grater than arguments length', () => {
+        const fn = ngLockElementByTargetEventArgument(2);
+        expect( function(){ fn(null, [{}]); } ).toThrow(new Error("argsIndex grater than arguments length"));
+    });
+    it('Argument not a HTMLElement and without a target element', () => {
+        const fn = ngLockElementByTargetEventArgument(0);
+        expect( function(){ fn(null, [{}]); } ).toThrow(new Error("Argument not a HTMLElement and without a target element"));
+    });
+    it('Argument with target property but not an HTMLElement', () => {
+        const fn = ngLockElementByTargetEventArgument(0);
+        expect( function(){ fn(null, [{target: true}]); } ).toThrow(new Error("Argument with target property but not an HTMLElement"));
+    });
+});
+
+
+describe('ngLockElementByQuerySelector', () => {
+    it('selector is required', () => {
+        const fn = ngLockElementByQuerySelector();
+        expect( function(){ fn(null, null); } ).toThrow(new Error("selector is required"));
+    });
+    it('Element not foun', () => {
+        const fn = ngLockElementByQuerySelector('#xxxxxxxxxxxxxxxxxxxxxxx');
+        expect( function(){ fn(null, null); } ).toThrow(new Error("Element not found"));
+    });
+});
+
+describe('ngLockElementByComponentProperty', () => {
+    it('Property is required', () => {
+        const fn = ngLockElementByComponentProperty();
+        expect( function(){ fn({}, null); } ).toThrow(new Error("Property is required"));
+    });
+    it('Element not found', () => {
+        const fn = ngLockElementByComponentProperty('xxxxxxxxxxxxxxxxxxxxxxx');
+        expect( function(){ fn({}, null); } ).toThrow(new Error("Property not found"));
+    });
+    it('Property must be a HTMLElement or object with nativeElement (also HTMLElement)', () => {
+        const fn = ngLockElementByComponentProperty('test');
+        expect( function(){ fn({test: null}, null); } ).toThrow(new Error("Property not found"));
+    });
+});

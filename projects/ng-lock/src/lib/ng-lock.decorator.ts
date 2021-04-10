@@ -39,10 +39,9 @@ export const ngLockElementByTargetEventArgument: NgLockElementFunction = (argsIn
             throw new Error('Method without arguments');
         }
         let arg: any;
-        if (argsIndex) {
-            if (argsIndex < 0) {
-                throw new Error('argsIndex muth be grater than or equal 0');
-            }
+        if (argsIndex < 0) {
+            throw new Error('argsIndex muth be grater than or equal 0');
+        } else if (argsIndex >= 0) {
             if (args.length - 1 < argsIndex) {
                 throw new Error('argsIndex grater than arguments length');
             }
