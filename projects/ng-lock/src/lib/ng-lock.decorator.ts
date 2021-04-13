@@ -1,7 +1,7 @@
 export const NG_UNLOCK_CALLBACK = "ngUnlockCallback";
 export const NG_LOCK_LOCKED_CLASS = 'ng-lock-locked'
 
-export type NgLockDecoratedFunction = {
+export interface NgLockDecoratedFunction {
     [NG_UNLOCK_CALLBACK]?: () => void
 }
 
@@ -24,7 +24,7 @@ export const ngLockElementByQuerySelector: NgLockElementFunction = (selector: st
         } else {
             throw new Error('Element not found');
         }
-    }
+    };
 };
 
 /**
@@ -47,29 +47,33 @@ export const ngLockElementByTargetEventArgument: NgLockElementFunction = (argsIn
                     throw new Error('argsIndex grater than arguments length');
                 }
                 arg = args[argsIndex];
+                if ((arg as MouseEvent).currentTarget instanceof HTMLElement) {
+                    return arg.currentTarget;
+                }
+                if ((arg as MouseEvent).target instanceof HTMLElement) {
+                    return arg.target;
+                }
                 if (arg instanceof HTMLElement) {
                     return arg;
                 }
-                if (!arg.target) {
-                    throw new Error('Argument not a HTMLElement and without a target element');
-                }
-                if (!(arg.target instanceof HTMLElement)) {
-                    throw new Error('Argument with target property but not an HTMLElement');
-                }
-                return arg.target;
+                throw new Error('Argument not an HTMLElement or with target, currentTarget property');
             }
         } else {
-            arg = args.find(arg => arg.target instanceof HTMLElement);
+            arg = args.find(_arg => (_arg as MouseEvent).currentTarget instanceof HTMLElement);
+            if (arg) {
+                return arg.currentTarget;
+            }
+            arg = args.find(_arg => (_arg as MouseEvent).target instanceof HTMLElement);
             if (arg) {
                 return arg.target;
             }
-            arg = args.find(arg => arg instanceof HTMLElement);
+            arg = args.find(_arg => _arg instanceof HTMLElement);
             if (arg) {
                 return arg;
             }
             throw new Error('Argument not found');
         }
-    }
+    };
 };
 
 /**
@@ -94,7 +98,7 @@ export const ngLockElementByComponentProperty: NgLockElementFunction = (property
         } else {
             throw new Error('Property not found');
         }
-    }
+    };
 };
 
 /**
@@ -127,7 +131,7 @@ export const NgLockDefaultOption: NgLockOption = {
     lockClass: NG_LOCK_LOCKED_CLASS,
     returnLastResultWhenLocked: false,
     debug: false
-}
+};
 
 /**
  * Lock the decorated function

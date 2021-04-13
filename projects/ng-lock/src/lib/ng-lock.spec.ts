@@ -331,13 +331,17 @@ describe('ngLockElementByTargetEventArgument', () => {
         const fn = ngLockElementByTargetEventArgument(2);
         expect(function () { fn(null, [{}]); }).toThrow(new Error("argsIndex grater than arguments length"));
     });
-    it('Argument not a HTMLElement and without a target element', () => {
+    it('Argument not an HTMLElement or with target, currentTarget property 1', () => {
         const fn = ngLockElementByTargetEventArgument(0);
-        expect(function () { fn(null, [{}]); }).toThrow(new Error("Argument not a HTMLElement and without a target element"));
+        expect(function () { fn(null, [{}]); }).toThrow(new Error("Argument not an HTMLElement or with target, currentTarget property"));
     });
-    it('Argument with target property but not an HTMLElement', () => {
+    it('Argument not an HTMLElement or with target, currentTarget property 2', () => {
         const fn = ngLockElementByTargetEventArgument(0);
-        expect(function () { fn(null, [{ target: true }]); }).toThrow(new Error("Argument with target property but not an HTMLElement"));
+        expect(function () { fn(null, [{ target: true }]); }).toThrow(new Error("Argument not an HTMLElement or with target, currentTarget property"));
+    });
+    it('Argument not an HTMLElement or with target, currentTarget property 3', () => {
+        const fn = ngLockElementByTargetEventArgument(0);
+        expect(function () { fn(null, [{ currentTarget: true }]); }).toThrow(new Error("Argument not an HTMLElement or with target, currentTarget property"));
     });
     it('Argument with el 1', () => {
         const el = document.createElement('DIV')
@@ -351,10 +355,20 @@ describe('ngLockElementByTargetEventArgument', () => {
     });
     it('Argument with el 3', () => {
         const el = document.createElement('DIV')
+        const fn = ngLockElementByTargetEventArgument(0);
+        expect(fn(null, [{ currentTarget: el }])).toBe(el);
+    });
+    it('Argument with el 4', () => {
+        const el = document.createElement('DIV')
         const fn = ngLockElementByTargetEventArgument();
         expect(fn(null, [{ target: el }])).toBe(el);
     });
-    it('Argument with el 4', () => {
+    it('Argument with el 5', () => {
+        const el = document.createElement('DIV')
+        const fn = ngLockElementByTargetEventArgument();
+        expect(fn(null, [{ currentTarget: el }])).toBe(el);
+    });
+    it('Argument with el 6', () => {
         const el = document.createElement('DIV')
         const fn = ngLockElementByTargetEventArgument();
         expect(fn(null, [el])).toBe(el);
