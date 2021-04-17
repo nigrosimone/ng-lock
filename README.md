@@ -260,13 +260,13 @@ Example of use with `unlockTimeout` option, eg.:
 
 ```ts
 import { Component } from '@angular/core';
-import { ngLock, ngUnlock } from 'ng-lock';
+import { ngLock, ngIslock } from 'ng-lock';
 
 @Component({
   selector: 'app-root',
   template: `
     <button (click)="onClick($event)">Click me!</button>
-    <button (click)="onUnlock()">Unlock</button>
+    <button (click)="onCheck()">Check</button>
   `,
   styles: [`
     button.ng-lock-locked {
@@ -289,8 +289,8 @@ export class AppComponent {
     console.log("task executed");
   }
 
-  onUnlock(){
-    ngUnlock(this.onClick);
+  onCheck(){
+    console.log('onClick lock state:', ngIslock(this.onClick));
   }
 }
 ```
@@ -300,12 +300,13 @@ Example of use with `maxCall` option, eg.:
 
 ```ts
 import { Component } from '@angular/core';
-import { ngLock } from 'ng-lock';
+import { ngLock, ngIslock, ngUnlock } from 'ng-lock';
 
 @Component({
   selector: 'app-root',
   template: `
     <button (click)="onClick($event)">Click me!</button>
+    <button (click)="onCheck()">Check</button>
     <button (click)="onUnlock()">Unlock</button>
   `,
   styles: [`
@@ -327,6 +328,10 @@ export class AppComponent {
   })
   onClick(event: MouseEvent){
     console.log("task executed");
+  }
+
+  onCheck(){
+    console.log('onClick lock state:', ngIslock(this.onClick));
   }
 
   onUnlock(){
