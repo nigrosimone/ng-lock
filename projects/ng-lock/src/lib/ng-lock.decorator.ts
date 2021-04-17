@@ -1,8 +1,11 @@
-export const NG_UNLOCK_CALLBACK = "ngUnlockCallback";
+export const NG_UNLOCK_CALLBACK = 'ngUnlockCallback';
+export const NG_ISLOCK_CALLBACK = 'ngIslockCallback';
+export type NG_CALLBACKS = typeof NG_UNLOCK_CALLBACK | typeof NG_ISLOCK_CALLBACK;
 export const NG_LOCK_LOCKED_CLASS = 'ng-lock-locked'
 
 export interface NgLockDecoratedFunction {
-    [NG_UNLOCK_CALLBACK]?: () => void
+    [NG_UNLOCK_CALLBACK]?: () => void;
+    [NG_ISLOCK_CALLBACK]?: () => boolean;
 }
 
 export type NgLockElementFunction = (...args: any[]) => NgLockElementFinder;
@@ -172,11 +175,15 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
             }
         };
 
+        const ngIslockCallback = () : boolean => {
+            return callCounter >= _options.maxCall;
+        };
+
         ngLockLog(`NgLock: decorate method "${key}"`);
 
         descriptor.value = function (...args: any[]) {
 
-            if (callCounter >= _options.maxCall) {
+            if ( ngIslockCallback() ) {
                 ngLockLog(`NgLock: method "${key}" locked at counter ${callCounter}`);
                 if (_options.returnLastResultWhenLocked) {
                     return lastResult;
@@ -188,7 +195,7 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
             if (_options.lockElementFunction) {
                 elementToLock = _options.lockElementFunction(this, args);
             }
-            if (callCounter >= _options.maxCall) {
+            if ( ngIslockCallback() ) {
                 if (_options.lockClass && elementToLock) {
                     elementToLock.classList.add(_options.lockClass);
                 }
@@ -208,6 +215,7 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
         };
 
         Object.defineProperty(descriptor.value, NG_UNLOCK_CALLBACK, { value: ngUnlockCallback, enumerable: true, writable: false });
+        Object.defineProperty(descriptor.value, NG_ISLOCK_CALLBACK, { value: ngIslockCallback, enumerable: true, writable: false });
 
         return descriptor;
     };
@@ -220,22 +228,37 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
  * @throws Error
  */
 export function ngUnlock(fn: Function): void {
-    const unlockCallback = ngUnlockCallback(fn);
-    unlockCallback();
+    const callback = ngCallbacks(fn, NG_UNLOCK_CALLBACK);
+    callback();
 }
 
 /**
- * Return the function for unlock a locked function by @ngLock() decorator
- * @param fn The function to return the unlock callback
- * @return Return the unlock callback
+ * Return true if the provided function is locked
+ * @param fn The function to unlock
+ * @return boolean
  * @throws Error
  */
-export function ngUnlockCallback(fn: Function): Function {
+ export function ngIslock(fn: Function): boolean {
+    const callback = ngCallbacks(fn, NG_ISLOCK_CALLBACK);
+    return callback();
+}
+
+/**
+ * Return the provided NG_CALLBACKS
+ * @param fn The function to return the unlock callback
+ * @param callback The NG_CALLBACKS
+ * @return Return the NG_CALLBACKS
+ * @throws Error
+ */
+export function ngCallbacks(fn: Function, callback: NG_CALLBACKS): Function {
     if (!(fn instanceof Function)) {
         throw new Error('"fn" param must be a function.');
     }
-    if (typeof fn[NG_UNLOCK_CALLBACK] !== 'function') {
+    if (callback !== NG_UNLOCK_CALLBACK && callback !== NG_ISLOCK_CALLBACK) {
+        throw new Error(`"callback" param "${callback}" must be a NG_CALLBACKS.`);
+    }
+    if (typeof fn[callback] !== 'function') {
         throw new Error(`"fn" param (function ${fn.name}) must be a @ngLock() decorated function.`);
     }
-    return fn[NG_UNLOCK_CALLBACK];
+    return fn[callback];
 }

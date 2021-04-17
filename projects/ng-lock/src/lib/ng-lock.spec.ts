@@ -1,6 +1,6 @@
 import { Component, DebugElement, ElementRef, ViewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ngLock, ngUnlock, ngLockElementByQuerySelector, ngLockElementByComponentProperty, ngLockElementByTargetEventArgument, NG_LOCK_LOCKED_CLASS, ngUnlockCallback } from './ng-lock.decorator';
+import { ngLock, ngUnlock, ngLockElementByQuerySelector, ngLockElementByComponentProperty, ngLockElementByTargetEventArgument, ngCallbacks, NG_UNLOCK_CALLBACK, NG_CALLBACKS } from './ng-lock.decorator';
 
 async function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -423,10 +423,14 @@ describe('ngLockElementByComponentProperty', () => {
 
 describe('ngUnlockCallback', () => {
     it('"fn" param must be a function', () => {
-        expect(function () { ngUnlockCallback(null); }).toThrow(new Error('"fn" param must be a function.'));
+        expect(function () { ngCallbacks(null, NG_UNLOCK_CALLBACK); }).toThrow(new Error('"fn" param must be a function.'));
     });
     it('"fn" param (function f) must be a @ngLock() decorated function.', () => {
         let f = () => { };
-        expect(function () { ngUnlockCallback(f); }).toThrow(new Error('"fn" param (function f) must be a @ngLock() decorated function.'));
+        expect(function () { ngCallbacks(f, NG_UNLOCK_CALLBACK); }).toThrow(new Error('"fn" param (function f) must be a @ngLock() decorated function.'));
+    });
+    it('"callback" param "TEST" must be a NG_CALLBACKS.', () => {
+        let f = () => { };
+        expect(function () { ngCallbacks(f, 'TEST' as NG_CALLBACKS); }).toThrow(new Error('"callback" param "TEST" must be a NG_CALLBACKS.'));
     });
 });

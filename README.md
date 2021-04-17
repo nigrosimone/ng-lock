@@ -236,6 +236,20 @@ export class AppComponent {
 }
 ```
 
+## Utils function
+
+Utils function exported by `ng-lock` library
+### nglock(fn: Function): void
+
+Lock the provided function
+### ngUnlock(fn: Function): void
+
+Unlock a locked function by `ngLock()` function
+
+### ngIslock(fn: Function): boolean
+
+Return `true` if the provided function is locked by `ngLock()` function
+
 ## Examples
 
 Below there are some examples of use case.
