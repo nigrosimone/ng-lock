@@ -233,6 +233,20 @@ export function ngUnlock(fn: Function): void {
 }
 
 /**
+ * Unlock all locked functions by @ngLock() decorator
+ * @param self The component instance (this)
+ * @return void
+ */
+export function ngUnlockAll(self: any): void {
+    Object.getOwnPropertyNames(self).forEach(key => {
+        const prop = self[key];
+        if( typeof prop === 'function' && typeof prop[NG_UNLOCK_CALLBACK] === 'function' ){
+            prop[NG_UNLOCK_CALLBACK]();
+        }
+    });
+}
+
+/**
  * Return true if the provided function is locked
  * @param fn The function to unlock
  * @return boolean

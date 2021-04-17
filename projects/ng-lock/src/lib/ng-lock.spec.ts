@@ -1,6 +1,6 @@
 import { Component, DebugElement, ElementRef, ViewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ngLock, ngUnlock, ngLockElementByQuerySelector, ngLockElementByComponentProperty, ngLockElementByTargetEventArgument, ngCallbacks, NG_UNLOCK_CALLBACK, NG_CALLBACKS, ngIslock } from './ng-lock.decorator';
+import { ngLock, ngUnlock, ngLockElementByQuerySelector, ngLockElementByComponentProperty, ngLockElementByTargetEventArgument, ngCallbacks, NG_UNLOCK_CALLBACK, NG_CALLBACKS, ngIslock, ngUnlockAll } from './ng-lock.decorator';
 
 async function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -435,4 +435,24 @@ describe('ngUnlockCallback', () => {
         let f = () => { };
         expect(function () { ngCallbacks(f, 'TEST' as NG_CALLBACKS); }).toThrow(new Error('"callback" param "TEST" must be a NG_CALLBACKS.'));
     });
+});
+
+describe('ngUnlockAll', () => {
+    it('ngUnlockAll', () => {
+
+        let test1 = false;
+        let test2 = false;
+        let self = {
+            test1: () => null,
+            test2: () => null
+        };
+        Object.defineProperty(self.test1, NG_UNLOCK_CALLBACK, { value: () => test1 = true, enumerable: true, writable: false });
+        Object.defineProperty(self.test2, NG_UNLOCK_CALLBACK, { value: () => test2 = true, enumerable: true, writable: false });
+
+        ngUnlockAll(self);
+
+        expect(test1).toBe(true);
+        expect(test2).toBe(true);
+    });
+    
 });

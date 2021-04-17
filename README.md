@@ -239,16 +239,51 @@ export class AppComponent {
 ## Utils function
 
 Utils function exported by `ng-lock` library
-### nglock(fn: Function): void
+### nglock(options?: NgLockOption): MethodDecorator
 
-Lock the provided function
+Lock the provided function. Usage as decorator eg.:
+
+```ts
+@ngLock()
+onClick(){
+  // ...
+}
+```
+
 ### ngUnlock(fn: Function): void
 
-Unlock a locked function by `ngLock()` function
+Unlock a locked function by `ngLock()` decorator. Usage, eg.:
 
+```ts
+@ngLock()
+onClick(){
+  // ...
+  ngUnlock(this.onClick);
+}
+```
 ### ngIslock(fn: Function): boolean
 
-Return `true` if the provided function is locked by `ngLock()` function
+Return `true` if the provided function is locked by `ngLock()` decorator. Usage, eg.:
+
+```ts
+@ngLock()
+onClick(){
+  // ...
+  console.log('onClick is locked?', ngIslock(this.onClick) );
+}
+```
+
+### ngUnlockAll(self: any): void
+
+Unlock all locked functions by `ngLock()` decorator. Argument `self` is the component istance (`this`). Usage, eg.:
+
+```ts
+@ngLock()
+onClick(){
+  // ...
+  ngUnlockAll(this);
+}
+```
 
 ## Examples
 
