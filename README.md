@@ -66,6 +66,7 @@ import { ngLock, ngUnlock } from 'ng-lock';
   template: `<button (click)="onClick($event)">Click me!</button>`,
   styles: [`
     button.ng-lock-locked {
+      pointer-events: none; // disable all event on element
       border: 1px solid #999999;
       background-color: #cccccc;
       color: #666666;
@@ -99,63 +100,138 @@ export class AppComponent {
 
 The options are:
 
- - *maxCall*: Max number of the calls beyond which the method is locked (default: `1`)
- - *unlockTimeout*: Max time (in millisecond) to lock function (default: `null` - no timeout)
- - *lockElementFunction*: function for find the HTML element for apply the  *lockClass* (default: `ngLockElementByTargetEventArgument()`)
- - *lockClass*: CSS class applied when the method is locked (default: `'ng-lock-locked'`)
- - *returnLastResultWhenLocked*: if `true`, when the method is locked the last result is returned, otherwise return `undefined` (default: `false`)
- - *debug*: if `true`, the decorator log into the console some info (default: `false`)
-
+| Option                       | Description                                                                                    | Default                                |
+| ---------------------------- | ---------------------------------------------------------------------------------------------- | -------------------------------------- |
+| *maxCall*                    | Max number of the calls beyond which the method is locked                                      | `1`                                    |
+| *unlockTimeout*              | Max time (in millisecond) to lock function                                                     | `null` _(no timeout)_                  |
+| *lockClass*                  | CSS class applied when the method is locked                                                    | `'ng-lock-locked'`                     |
+| *lockElementFunction*        | function for find the HTML element for apply the *lockClass*                                   | `ngLockElementByTargetEventArgument()` |
+| *returnLastResultWhenLocked* | if `true`, when the method is locked the last result is returned, otherwise return `undefined` | `false`                                |
+| *debug*                      | if `true`, the decorator log into the console some info                                        | `false`                                |
 
 ### Available lockElementFunction
 
-*ngLockElementByQuerySelector*
+The *lockElementFunction* is function used for find into the HTML the element for apply the *lockClass* (default class is `'ng-lock-locked'`).
+
+#### ngLockElementByQuerySelector(selector: string)
+
+Uses the provided "selector" to find with "querySelector()" and apply the lockClass on the founded element. The `selector` is a DOMString containing a selector to match. Eg.:
 
 ```ts
-/**
- * Uses the provided "selector" to find with "querySelector()" and apply the lockClass on the founded element.
- * @param selector A DOMString containing a selector to match.
- */
-@ngLock({
-  lockElementFunction: ngLockElementByQuerySelector('.my-class')
+import { Component } from '@angular/core';
+import { ngLock, ngUnlock } from 'ng-lock';
+
+@Component({
+  selector: 'app-root',
+  template: `<button (click)="onClick()" class="my-class">Click me!</button>`,
+  styles: [`
+    button.ng-lock-locked {
+      pointer-events: none; // disable all event on element
+      border: 1px solid #999999;
+      background-color: #cccccc;
+      color: #666666;
+    }
+  `]
 })
-onClick(){
-  // ...
+export class AppComponent {
+
+  /**
+   * @ngLock() apply lock on method and "ng-lock-locked" class on the html element with the class "my-class"
+   */
+  @ngLock({
+    lockElementFunction: ngLockElementByQuerySelector('.my-class')
+  })
+  onClick(){
+    // ...simulate async long task
+    setTimeout(() => {
+      console.log("task executed");
+      // unlock the method and remove "ng-lock-locked" class on the button
+      ngUnlock(this.onClick);
+    }, 3000);
+  }
+
 }
 ```
 
-*ngLockElementByTargetEventArgument*
+#### ngLockElementByTargetEventArgument(argsIndex?: number)
+
+Uses a function argument for apply the lockClass. If provided a `argsIndex` use the specific argument (index of the argument), otherwise search an argument with a target property (o currentTarget) that is a HTMLElement. Eg.:
 
 ```ts
-/**
- * Uses a function argument for apply the lockClass. If provided a argsIndex use the specific argument, otherwise
- * search an argument with a target property that is a HTMLElement
- * @param argsIndex (optional) index of the argument that is HTMLElement or contains target property (also a HTMLElement)
- * @returns Return a NgLockElementFinder function
- */
-@ngLock({
-  lockElementFunction: ngLockElementByTargetEventArgument()
+import { Component } from '@angular/core';
+import { ngLock, ngUnlock } from 'ng-lock';
+
+@Component({
+  selector: 'app-root',
+  template: `<button (click)="onClick(1, $event)">Click me!</button>`,
+  styles: [`
+    button.ng-lock-locked {
+      pointer-events: none; // disable all event on element
+      border: 1px solid #999999;
+      background-color: #cccccc;
+      color: #666666;
+    }
+  `]
 })
-onClick(event: MouseEvent){
-  // ...
+export class AppComponent {
+
+  /**
+   * @ngLock() apply lock on method and "ng-lock-locked" class on the html element provided into the target element of the second argument (index 1) of onClick() method
+   */
+  @ngLock({
+    lockElementFunction: ngLockElementByTargetEventArgument(1)
+  })
+  onClick(value: number, event: MouseEvent){
+    // ...simulate async long task
+    setTimeout(() => {
+      console.log("task executed", value);
+      // unlock the method and remove "ng-lock-locked" class on the button
+      ngUnlock(this.onClick);
+    }, 3000);
+  }
+
 }
 ```
 
-*ngLockElementByComponentProperty*
+#### ngLockElementByComponentProperty(property: string)
+
+Apply lockClass to a component property that must be a HTMLElement or element with Angular nativeElement (also a HTMLElement). Eg.:
 
 ```ts
-/**
- * Apply lockClass to a component property that must be a HTMLElement or element with Angular nativeElement (also a HTMLElement)
- * @param property The property name of the component
- * @returns Return a NgLockElementFinder function
- */
-@ViewChild("button") button: ElementRef<HTMLElement>;
+import { Component, ViewChild } from '@angular/core';
+import { ngLock, ngUnlock } from 'ng-lock';
 
-@ngLock({
-  lockElementFunction: ngLockElementByComponentProperty('button')
+@Component({
+  selector: 'app-root',
+  template: `<button (click)="onClick()" #button>Click me!</button>`,
+  styles: [`
+    button.ng-lock-locked {
+      pointer-events: none; // disable all event on element
+      border: 1px solid #999999;
+      background-color: #cccccc;
+      color: #666666;
+    }
+  `]
 })
-onClick(){
-  // ...
+export class AppComponent {
+
+  @ViewChild("button") button: ElementRef<HTMLElement>;
+
+  /**
+   * @ngLock() apply lock on method and "ng-lock-locked" class on the html element provided into the "button" property of the component
+   */
+  @ngLock({
+    lockElementFunction: ngLockElementByComponentProperty('button')
+  })
+  onClick(){
+    // ...simulate async long task
+    setTimeout(() => {
+      console.log("task executed");
+      // unlock the method and remove "ng-lock-locked" class on the button
+      ngUnlock(this.onClick);
+    }, 3000);
+  }
+
 }
 ```
 
@@ -179,6 +255,7 @@ import { ngLock, ngUnlock } from 'ng-lock';
   `,
   styles: [`
     button.ng-lock-locked {
+      pointer-events: none; // disable all event on element
       border: 1px solid #999999;
       background-color: #cccccc;
       color: #666666;
@@ -218,6 +295,7 @@ import { ngLock } from 'ng-lock';
   `,
   styles: [`
     button.ng-lock-locked {
+      pointer-events: none; // disable all event on element
       border: 1px solid #999999;
       background-color: #cccccc;
       color: #666666;
