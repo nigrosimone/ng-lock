@@ -28,6 +28,7 @@ import { ngLock, ngUnlock } from 'ng-lock';
   template: `<button (click)="onClick($event)">Click me!</button>`,
   styles: [`
     button.ng-lock-locked {
+      pointer-events: none; // disable all event on element
       border: 1px solid #999999;
       background-color: #cccccc;
       color: #666666;
