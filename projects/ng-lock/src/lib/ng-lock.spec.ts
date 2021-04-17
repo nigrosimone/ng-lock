@@ -1,6 +1,6 @@
 import { Component, DebugElement, ElementRef, ViewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ngLock, ngUnlock, ngLockElementByQuerySelector, ngLockElementByComponentProperty, ngLockElementByTargetEventArgument, ngCallbacks, NG_UNLOCK_CALLBACK, NG_CALLBACKS } from './ng-lock.decorator';
+import { ngLock, ngUnlock, ngLockElementByQuerySelector, ngLockElementByComponentProperty, ngLockElementByTargetEventArgument, ngCallbacks, NG_UNLOCK_CALLBACK, NG_CALLBACKS, ngIslock } from './ng-lock.decorator';
 
 async function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -47,12 +47,14 @@ describe('NgLock: 1', () => {
     it('test', () => {
         fixture.detectChanges();
         expect(element.textContent).toBe('0');
+        expect(ngIslock(component.onClick)).toBe(false);
         component.onClick();
         fixture.detectChanges();
         expect(element.textContent).toBe('1');
         component.onClick();
         fixture.detectChanges();
         expect(element.textContent).toBe('1');
+        expect(ngIslock(component.onClick)).toBe(true);
         component.unlock();
         fixture.detectChanges();
         expect(element.className).toBe('');
