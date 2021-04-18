@@ -116,7 +116,7 @@ The *lockElementFunction* is function used for find into the HTML the element fo
 
 #### ngLockElementByQuerySelector(selector: string)
 
-Uses the provided "selector" to find with "querySelector()" and apply the lockClass on the founded element. The `selector` is a DOMString containing a selector to match. Eg.:
+Uses the provided `selector` to find with `document.querySelector()` and apply the *lockClass* on the founded element. The `selector` is a `DOMString` containing a selector to match. Eg.:
 
 ```ts
 import { Component } from '@angular/core';
@@ -156,7 +156,7 @@ export class AppComponent {
 
 #### ngLockElementByTargetEventArgument(argsIndex?: number)
 
-Uses a function argument for apply the lockClass. If provided a `argsIndex` use the specific argument (index of the argument), otherwise search an argument with a target property (o currentTarget) that is a HTMLElement. Eg.:
+Uses a function argument for apply the *lockClass*. If provided a `argsIndex` use the specific argument (index of the argument), otherwise search an argument with a target property (o currentTarget) that is a `HTMLElement`. Eg.:
 
 ```ts
 import { Component } from '@angular/core';
@@ -196,7 +196,7 @@ export class AppComponent {
 
 #### ngLockElementByComponentProperty(property: string)
 
-Apply lockClass to a component property that must be a HTMLElement or element with Angular nativeElement (also a HTMLElement). Eg.:
+Apply *lockClass* to a component property that must be a `HTMLElement` or element with Angular `nativeElement` (also a `HTMLElement`). Eg.:
 
 ```ts
 import { Component, ViewChild } from '@angular/core';
@@ -223,6 +223,53 @@ export class AppComponent {
    */
   @ngLock({
     lockElementFunction: ngLockElementByComponentProperty('button')
+  })
+  onClick(){
+    // ...simulate async long task
+    setTimeout(() => {
+      console.log("task executed");
+      // unlock the method and remove "ng-lock-locked" class on the button
+      ngUnlock(this.onClick);
+    }, 3000);
+  }
+
+}
+```
+
+#### Write a custom lockElementFunction
+
+You can write a custom *lockElementFunction*. Eg.:
+
+```ts
+import { Component } from '@angular/core';
+import { ngLock, ngUnlock, NgLockElementFunction, NgLockElementFinder } from 'ng-lock';
+
+const myLockElementFunction: NgLockElementFunction = (): NgLockElementFinder => {
+  /**
+   * @param self Is a component istance (in this example AppComponent).
+   * @param args Is a @ngLock() decorated function arguments (in this example onClick()).
+   */
+  return (self: any, args: any[]): Element => {
+    // Write your logic here ...
+  };
+};
+
+@Component({
+  selector: 'app-root',
+  template: `<button (click)="onClick()" #button>Click me!</button>`,
+  styles: [`
+    button.ng-lock-locked {
+      pointer-events: none; // disable all event on element
+      border: 1px solid #999999;
+      background-color: #cccccc;
+      color: #666666;
+    }
+  `]
+})
+export class AppComponent {
+
+  @ngLock({
+    lockElementFunction: myLockElementFunction()
   })
   onClick(){
     // ...simulate async long task

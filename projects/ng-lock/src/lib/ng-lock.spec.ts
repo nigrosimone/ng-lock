@@ -444,7 +444,8 @@ describe('ngUnlockAll', () => {
         let test2 = false;
         let self = {
             test1: () => null,
-            test2: () => null
+            test2: () => null,
+            test3: null
         };
         Object.defineProperty(self.test1, NG_UNLOCK_CALLBACK, { value: () => test1 = true, enumerable: true, writable: false });
         Object.defineProperty(self.test2, NG_UNLOCK_CALLBACK, { value: () => test2 = true, enumerable: true, writable: false });
