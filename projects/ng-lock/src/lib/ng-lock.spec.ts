@@ -2,13 +2,14 @@ import { Component, DebugElement, ElementRef, ViewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ngLock, ngUnlock, ngLockElementByQuerySelector, ngLockElementByComponentProperty, ngLockElementByTargetEventArgument, ngCallbacks, NG_UNLOCK_CALLBACK, NG_CALLBACKS, ngIslock, ngUnlockAll } from './ng-lock.decorator';
 
-async function sleep(ms) {
+async function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 @Component({ template: '<button (click)="onClick()" id="button" #button>{{value}}</button>' })
+// eslint-disable-next-line @angular-eslint/component-class-suffix
 class TestComponent1 {
-    @ViewChild('button') button: ElementRef<HTMLElement>;
+    @ViewChild('button') button!: ElementRef<HTMLElement>;
 
     value = 0;
 
@@ -68,8 +69,9 @@ describe('NgLock: 1', () => {
 
 
 @Component({ template: '<button (click)="onClick()" #button>{{value}}</button>' })
+// eslint-disable-next-line @angular-eslint/component-class-suffix
 class TestComponent2 {
-    @ViewChild('button') button: ElementRef<HTMLElement>;
+    @ViewChild('button') button!: ElementRef<HTMLElement>;
 
     value = 0;
 
@@ -127,15 +129,17 @@ describe('NgLock: 2', () => {
 
 
 @Component({ template: '<button (click)="onClick()" #button>{{value}}</button>' })
+// eslint-disable-next-line @angular-eslint/component-class-suffix
 class TestComponent3 {
-    @ViewChild('button') button: ElementRef<HTMLElement>;
+    @ViewChild('button') button!: ElementRef<HTMLElement>;
 
     value = 0;
 
     @ngLock({
         lockElementFunction: ngLockElementByTargetEventArgument()
     })
-    onClick(e) {
+    // eslint-disable-next-line no-unused-vars
+    onClick(e: any) {
         this.value++;
     }
 
@@ -186,19 +190,21 @@ describe('NgLock: 3', () => {
 
 
 @Component({ template: '<button (click)="onClick()" #button>{{value}}</button>' })
+// eslint-disable-next-line @angular-eslint/component-class-suffix
 class TestComponent4 {
-    @ViewChild('button') button: ElementRef<HTMLElement>;
+    @ViewChild('button') button!: ElementRef<HTMLElement>;
 
     value = 0;
 
     @ngLock({
-        lockElementFunction: null,
-        lockClass: null,
+        lockElementFunction: null as any,
+        lockClass: null as any,
         returnLastResultWhenLocked: true,
         unlockTimeout: 1,
         debug: true
     })
-    onClick(e) {
+    // eslint-disable-next-line no-unused-vars
+    onClick(e: any) {
         this.value++;
     }
 }
@@ -257,18 +263,19 @@ describe('NgLock', () => {
         let count = 0;
 
         const descriptor = {
-            value: (x) => {
+            // eslint-disable-next-line no-unused-vars
+            value: (x: any) => {
                 count++;
                 return count;
             }
         };
 
-        _ngLock(null, 'test', descriptor);
+        _ngLock(null as any, 'test', descriptor);
 
         const el = document.createElement('DIV')
 
         expect(descriptor.value(el)).toBe(1);
-        expect(descriptor.value(el)).toBe(undefined);
+        expect(descriptor.value(el)).toBe(undefined as any);
     });
 
     it('Mounth 2', () => {
@@ -277,19 +284,20 @@ describe('NgLock', () => {
         let count = 0;
 
         const descriptor = {
-            value: (x) => {
+            // eslint-disable-next-line no-unused-vars
+            value: (x: any) => {
                 count++;
                 return count;
             }
         };
 
-        _ngLock(null, 'test', descriptor);
+        _ngLock(null as any, 'test', descriptor);
 
         const el = document.createElement('DIV')
 
         expect(descriptor.value(el)).toBe(1);
         expect(descriptor.value(el)).toBe(2);
-        expect(descriptor.value(el)).toBe(undefined);
+        expect(descriptor.value(el)).toBe(undefined as any);
     });
 
     it('Mounth 2', () => {
@@ -298,13 +306,14 @@ describe('NgLock', () => {
         let count = 0;
 
         const descriptor = {
-            value: (x) => {
+            // eslint-disable-next-line no-unused-vars
+            value: (x: any) => {
                 count++;
                 return count;
             }
         };
 
-        _ngLock(null, 'test', descriptor);
+        _ngLock(null as any, 'test', descriptor);
 
         const el = document.createElement('DIV')
 
@@ -319,7 +328,7 @@ describe('NgLock', () => {
 describe('ngLockElementByTargetEventArgument', () => {
     it('Method without arguments', () => {
         const fn = ngLockElementByTargetEventArgument();
-        expect(function () { fn(null, null); }).toThrow(new Error("Method without arguments"));
+        expect(function () { fn(null, null as any); }).toThrow(new Error("Method without arguments"));
     });
     it('Argument not found', () => {
         const fn = ngLockElementByTargetEventArgument();
@@ -381,51 +390,51 @@ describe('ngLockElementByTargetEventArgument', () => {
 describe('ngLockElementByQuerySelector', () => {
     it('selector is required', () => {
         const fn = ngLockElementByQuerySelector();
-        expect(function () { fn(null, null); }).toThrow(new Error("selector is required"));
+        expect(function () { fn(null, null as any); }).toThrow(new Error("selector is required"));
     });
     it('Element not foun', () => {
         const fn = ngLockElementByQuerySelector('#xxxxxxxxxxxxxxxxxxxxxxx');
-        expect(function () { fn(null, null); }).toThrow(new Error("Element not found"));
+        expect(function () { fn(null, null as any); }).toThrow(new Error("Element not found"));
     });
     it('Argument with el', () => {
         const fn = ngLockElementByQuerySelector('body');
-        expect(fn(null, null)).toBe(document.querySelector('body'));
+        expect(fn(null, null as any)).toBe(document.querySelector('body') as any);
     });
 });
 
 describe('ngLockElementByComponentProperty', () => {
     it('Property is required', () => {
         const fn = ngLockElementByComponentProperty();
-        expect(function () { fn({}, null); }).toThrow(new Error("Property is required"));
+        expect(function () { fn({}, null as any); }).toThrow(new Error("Property is required"));
     });
     it('Element not found', () => {
         const fn = ngLockElementByComponentProperty('xxxxxxxxxxxxxxxxxxxxxxx');
-        expect(function () { fn({}, null); }).toThrow(new Error("Property not found"));
+        expect(function () { fn({}, null as any); }).toThrow(new Error("Property not found"));
     });
     it('Property not found', () => {
         const fn = ngLockElementByComponentProperty('test');
-        expect(function () { fn({ test: null }, null); }).toThrow(new Error("Property not found"));
+        expect(function () { fn({ test: null }, null as any); }).toThrow(new Error("Property not found"));
     });
     it('Property must be a HTMLElement or object with nativeElement (also HTMLElement)', () => {
         const fn = ngLockElementByComponentProperty('test');
-        expect(function () { fn({ test: { nativeElement: null } }, null); }).toThrow(new Error("Property must be a HTMLElement or object with nativeElement (also HTMLElement)"));
+        expect(function () { fn({ test: { nativeElement: null } }, null as any); }).toThrow(new Error("Property must be a HTMLElement or object with nativeElement (also HTMLElement)"));
     });
     it('Argument with el 1', () => {
         const el = document.createElement('DIV')
         const fn = ngLockElementByComponentProperty('test');
-        expect(fn({ test: el }, null)).toBe(el);
+        expect(fn({ test: el }, null as any)).toBe(el);
     });
     it('Argument with el 2', () => {
         const el = document.createElement('DIV')
         const fn = ngLockElementByComponentProperty('test');
-        expect(fn({ test: { nativeElement: el } }, null)).toBe(el);
+        expect(fn({ test: { nativeElement: el } }, null as any)).toBe(el);
     });
 });
 
 
 describe('ngUnlockCallback', () => {
     it('"fn" param must be a function', () => {
-        expect(function () { ngCallbacks(null, NG_UNLOCK_CALLBACK); }).toThrow(new Error('"fn" param must be a function.'));
+        expect(function () { ngCallbacks(null as any, NG_UNLOCK_CALLBACK); }).toThrow(new Error('"fn" param must be a function.'));
     });
     it('"fn" param (function f) must be a @ngLock() decorated function.', () => {
         let f = () => { };

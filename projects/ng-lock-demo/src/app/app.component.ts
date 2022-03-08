@@ -1,8 +1,9 @@
 import { Component, ViewChild } from '@angular/core';
-import { ngLock, NgLockDecoratedFunction, ngLockElementByComponentProperty, ngLockElementByQuerySelector, ngUnlock } from 'projects/ng-lock/src/public-api';
+import { ngLock, ngLockElementByComponentProperty, ngLockElementByQuerySelector, ngUnlock } from 'projects/ng-lock/src/public-api';
 
 
 @Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
@@ -11,6 +12,7 @@ export class AppComponent {
   @ViewChild("button3") button3 = null;
 
   @ngLock()
+  // eslint-disable-next-line no-unused-vars
   test1(e: MouseEvent) {
     setTimeout(() => {
       console.log("test1");
@@ -19,7 +21,8 @@ export class AppComponent {
   }
 
   @ngLock({ unlockTimeout: 3000 })
-  test2(e) {
+  // eslint-disable-next-line no-unused-vars
+  test2(e: any) {
     setTimeout(() => {
       console.log("test2");
     }, 1000);
@@ -56,10 +59,10 @@ export class AppComponent {
   }
 
   @ngLock({
-    lockElementFunction: null
+    lockElementFunction: null as any
   })
-  test6() {
-    (this.test6 as NgLockDecoratedFunction).ngUnlockCallback();
+  test6(): void {
+    (this.test6 as any).ngUnlockCallback();
     console.log("test6");
   }
 
@@ -85,7 +88,7 @@ export class AppComponent {
 
   @ngLock({
     maxCall: 3,
-    lockElementFunction: null,
+    lockElementFunction: null as any,
     returnLastResultWhenLocked: true
   })
   test9(): Promise<boolean> {

@@ -8,7 +8,9 @@ export interface NgLockDecoratedFunction {
     [NG_ISLOCK_CALLBACK]?: () => boolean;
 }
 
+// eslint-disable-next-line no-unused-vars
 export type NgLockElementFunction = (...args: any[]) => NgLockElementFinder;
+// eslint-disable-next-line no-unused-vars
 export type NgLockElementFinder = (self: any, args: any[]) => Element;
 
 /**
@@ -17,6 +19,7 @@ export type NgLockElementFinder = (self: any, args: any[]) => Element;
  * @returns Return a NgLockElementFinder function
  */
 export const ngLockElementByQuerySelector: NgLockElementFunction = (selector: string): NgLockElementFinder => {
+    // eslint-disable-next-line no-unused-vars
     return (self: any, args: any[]): Element => {
         if (!selector) {
             throw new Error('selector is required');
@@ -85,6 +88,7 @@ export const ngLockElementByTargetEventArgument: NgLockElementFunction = (argsIn
  * @returns Return a NgLockElementFinder function
  */
 export const ngLockElementByComponentProperty: NgLockElementFunction = (property: string): NgLockElementFinder => {
+    // eslint-disable-next-line no-unused-vars
     return (self: any, args: any[]): Element => {
         if (!property) {
             throw new Error('Property is required');
@@ -116,7 +120,7 @@ export const ngLockElementByComponentProperty: NgLockElementFunction = (property
  */
 export interface NgLockOption {
     maxCall?: number,
-    unlockTimeout?: number;
+    unlockTimeout?: number | null;
     lockElementFunction?: NgLockElementFinder;
     lockClass?: string;
     returnLastResultWhenLocked?: boolean;
@@ -142,7 +146,7 @@ export const NgLockDefaultOption: NgLockOption = {
  * @return Return a MethodDecorator
  */
 export function ngLock(options?: NgLockOption): MethodDecorator {
-    return function (target: Function, key: string, descriptor: any) {
+    return function (target: any, key: any, descriptor: any): void {
 
         let _options: NgLockOption;
         if (!options) {
@@ -152,8 +156,8 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
         }
 
         let callCounter: number = 0;
-        let timeoutHandle: number = null;
-        let elementToLock: Element = null;
+        let timeoutHandle: number | null = null;
+        let elementToLock: Element | null = null;
         let lastResult: any = undefined;
 
         const originalMethod: any = descriptor.value;
@@ -175,15 +179,15 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
             }
         };
 
-        const ngIslockCallback = () : boolean => {
-            return callCounter >= _options.maxCall;
+        const ngIslockCallback = (): boolean => {
+            return callCounter >= (_options as any)?.maxCall;
         };
 
         ngLockLog(`NgLock: decorate method "${key}"`);
 
         descriptor.value = function (...args: any[]) {
 
-            if ( ngIslockCallback() ) {
+            if (ngIslockCallback()) {
                 ngLockLog(`NgLock: method "${key}" locked at counter ${callCounter}`);
                 if (_options.returnLastResultWhenLocked) {
                     return lastResult;
@@ -195,7 +199,7 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
             if (_options.lockElementFunction) {
                 elementToLock = _options.lockElementFunction(this, args);
             }
-            if ( ngIslockCallback() ) {
+            if (ngIslockCallback()) {
                 if (_options.lockClass && elementToLock) {
                     elementToLock.classList.add(_options.lockClass);
                 }
@@ -208,7 +212,7 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
                 timeoutHandle = setTimeout(() => {
                     ngLockLog(`NgLock: timeout reached for method "${key}"`);
                     ngUnlockCallback();
-                }, _options.unlockTimeout);
+                }, _options.unlockTimeout) as any;
             }
 
             return lastResult;
@@ -240,7 +244,7 @@ export function ngUnlock(fn: Function): void {
 export function ngUnlockAll(self: any): void {
     Object.getOwnPropertyNames(self).forEach(key => {
         const prop = self[key];
-        if( typeof prop === 'function' && typeof prop[NG_UNLOCK_CALLBACK] === 'function' ){
+        if (typeof prop === 'function' && typeof prop[NG_UNLOCK_CALLBACK] === 'function') {
             prop[NG_UNLOCK_CALLBACK]();
         }
     });
@@ -252,7 +256,7 @@ export function ngUnlockAll(self: any): void {
  * @return boolean
  * @throws Error
  */
- export function ngIslock(fn: Function): boolean {
+export function ngIslock(fn: Function): boolean {
     const callback = ngCallbacks(fn, NG_ISLOCK_CALLBACK);
     return callback();
 }
@@ -271,8 +275,8 @@ export function ngCallbacks(fn: Function, callback: NG_CALLBACKS): Function {
     if (callback !== NG_UNLOCK_CALLBACK && callback !== NG_ISLOCK_CALLBACK) {
         throw new Error(`"callback" param "${callback}" must be a NG_CALLBACKS.`);
     }
-    if (typeof fn[callback] !== 'function') {
+    if (typeof (fn as any)[callback as any] !== 'function') {
         throw new Error(`"fn" param (function ${fn.name}) must be a @ngLock() decorated function.`);
     }
-    return fn[callback];
+    return (fn as any)[callback];
 }
