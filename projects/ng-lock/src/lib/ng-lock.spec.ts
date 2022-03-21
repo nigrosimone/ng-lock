@@ -229,7 +229,7 @@ describe('NgLock: 4', () => {
         document.body.removeChild(element);
     });
 
-    it('test', async (done) => {
+    it('test', async () => {
         fixture.detectChanges();
         expect(element.textContent).toBe('0');
         component.onClick({ target: component.button.nativeElement });
@@ -246,8 +246,6 @@ describe('NgLock: 4', () => {
         component.onClick({ target: component.button.nativeElement });
         fixture.detectChanges();
         expect(element.textContent).toBe('2');
-
-        done();
     });
 });
 
