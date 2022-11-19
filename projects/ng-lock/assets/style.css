@@ -1,0 +1,3 @@
+.ng-lock-locked {
+    pointer-events: none; // disable all event on element
+}

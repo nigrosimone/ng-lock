@@ -3,5 +3,6 @@
   "dest": "../../dist/ng-lock",
   "lib": {
     "entryFile": "src/public-api.ts"
-  }
+  },
+  "assets": ["src/assets/**/*.*"]
 }
