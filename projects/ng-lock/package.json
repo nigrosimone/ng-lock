@@ -1,6 +1,6 @@
 {
   "name": "ng-lock",
-  "version": "15.0.1",
+  "version": "16.0.0",
   "description": "Angular decorator for lock a function and user interface while a task running.",
   "repository": {
     "type": "git",
@@ -16,8 +16,8 @@
   },
   "homepage": "https://github.com/nigrosimone/ng-lock",
   "peerDependencies": {
-    "@angular/common": "^15.0.0",
-    "@angular/core": "^15.0.0"
+    "@angular/common": ">15.0.0",
+    "@angular/core": ">15.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"
