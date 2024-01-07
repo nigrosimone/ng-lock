@@ -1,6 +1,6 @@
 {
   "name": "ng-lock",
-  "version": "16.0.1",
+  "version": "17.0.0",
   "description": "Angular decorator for lock a function and user interface while a task running.",
   "repository": {
     "type": "git",

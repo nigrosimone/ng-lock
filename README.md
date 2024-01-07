@@ -308,7 +308,7 @@ onClick(){
   ngUnlock(this.onClick);
 }
 ```
-### ngIslock(fn: Function): boolean
+### ngIsLock(fn: Function): boolean
 
 Return `true` if the provided function is locked by `ngLock()` decorator. Usage, eg.:
 
@@ -316,7 +316,7 @@ Return `true` if the provided function is locked by `ngLock()` decorator. Usage,
 @ngLock()
 onClick(){
   // ...
-  console.log('onClick is locked?', ngIslock(this.onClick) );
+  console.log('onClick is locked?', ngIsLock(this.onClick) );
 }
 ```
 
@@ -342,7 +342,7 @@ Example of use with `unlockTimeout` option, eg.:
 
 ```ts
 import { Component } from '@angular/core';
-import { ngLock, ngIslock } from 'ng-lock';
+import { ngLock, ngIsLock } from 'ng-lock';
 
 @Component({
   selector: 'app-root',

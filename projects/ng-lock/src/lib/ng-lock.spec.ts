@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Component, DebugElement, ElementRef, ViewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ngLock, ngUnlock, ngLockElementByQuerySelector, ngLockElementByComponentProperty, ngLockElementByTargetEventArgument, ngCallbacks, NG_UNLOCK_CALLBACK, NG_CALLBACKS, ngIslock, ngUnlockAll } from './ng-lock.decorator';
+import { ngLock, ngUnlock, ngLockElementByQuerySelector, ngLockElementByComponentProperty, ngLockElementByTargetEventArgument, ngCallbacks, NG_UNLOCK_CALLBACK, NG_CALLBACKS, ngIsLock, ngUnlockAll } from './ng-lock.decorator';
 
 async function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -48,14 +49,14 @@ describe('NgLock: 1', () => {
     it('test', () => {
         fixture.detectChanges();
         expect(element.textContent).toBe('0');
-        expect(ngIslock(component.onClick)).toBe(false);
+        expect(ngIsLock(component.onClick)).toBe(false);
         component.onClick();
         fixture.detectChanges();
         expect(element.textContent).toBe('1');
         component.onClick();
         fixture.detectChanges();
         expect(element.textContent).toBe('1');
-        expect(ngIslock(component.onClick)).toBe(true);
+        expect(ngIsLock(component.onClick)).toBe(true);
         component.unlock();
         fixture.detectChanges();
         expect(element.className).toBe('');
@@ -138,7 +139,7 @@ class TestComponent3 {
     @ngLock({
         lockElementFunction: ngLockElementByTargetEventArgument()
     })
-    // eslint-disable-next-line no-unused-vars
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
     onClick(e: any) {
         this.value++;
     }
@@ -203,7 +204,7 @@ class TestComponent4 {
         unlockTimeout: 1,
         debug: true
     })
-    // eslint-disable-next-line no-unused-vars
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
     onClick(e: any) {
         this.value++;
     }
@@ -255,13 +256,13 @@ describe('NgLock: 4', () => {
 
 
 describe('NgLock', () => {
-    it('Mounth 1', () => {
+    it('test 1', () => {
         const _ngLock = ngLock();
 
         let count = 0;
 
         const descriptor = {
-            // eslint-disable-next-line no-unused-vars
+            // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
             value: (x: any) => {
                 count++;
                 return count;
@@ -276,13 +277,13 @@ describe('NgLock', () => {
         expect(descriptor.value(el)).toBe(undefined as any);
     });
 
-    it('Mounth 2', () => {
+    it('test 2', () => {
         const _ngLock = ngLock({ maxCall: 2 });
 
         let count = 0;
 
         const descriptor = {
-            // eslint-disable-next-line no-unused-vars
+            // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
             value: (x: any) => {
                 count++;
                 return count;
@@ -298,13 +299,13 @@ describe('NgLock', () => {
         expect(descriptor.value(el)).toBe(undefined as any);
     });
 
-    it('Mounth 2', () => {
+    it('test 3', () => {
         const _ngLock = ngLock({ maxCall: 2, returnLastResultWhenLocked: true });
 
         let count = 0;
 
         const descriptor = {
-            // eslint-disable-next-line no-unused-vars
+            // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
             value: (x: any) => {
                 count++;
                 return count;
@@ -332,9 +333,9 @@ describe('ngLockElementByTargetEventArgument', () => {
         const fn = ngLockElementByTargetEventArgument();
         expect(function () { fn(null, [{}]); }).toThrow(new Error("Argument not found"));
     });
-    it('argsIndex muth be grater than or equal 0', () => {
+    it('argsIndex must be grater than or equal 0', () => {
         const fn = ngLockElementByTargetEventArgument(-1);
-        expect(function () { fn(null, [{}]); }).toThrow(new Error("argsIndex muth be grater than or equal 0"));
+        expect(function () { fn(null, [{}]); }).toThrow(new Error("argsIndex must be grater than or equal 0"));
     });
     it('argsIndex grater than arguments length', () => {
         const fn = ngLockElementByTargetEventArgument(2);
@@ -435,11 +436,13 @@ describe('ngUnlockCallback', () => {
         expect(function () { ngCallbacks(null as any, NG_UNLOCK_CALLBACK); }).toThrow(new Error('"fn" param must be a function.'));
     });
     it('"fn" param (function f) must be a @ngLock() decorated function.', () => {
-        let f = () => { };
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        const f = () => { };
         expect(function () { ngCallbacks(f, NG_UNLOCK_CALLBACK); }).toThrow(new Error('"fn" param (function f) must be a @ngLock() decorated function.'));
     });
     it('"callback" param "TEST" must be a NG_CALLBACKS.', () => {
-        let f = () => { };
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        const f = () => { };
         expect(function () { ngCallbacks(f, 'TEST' as NG_CALLBACKS); }).toThrow(new Error('"callback" param "TEST" must be a NG_CALLBACKS.'));
     });
 });
@@ -449,7 +452,7 @@ describe('ngUnlockAll', () => {
 
         let test1 = false;
         let test2 = false;
-        let self = {
+        const self = {
             test1: () => null,
             test2: () => null,
             test3: null

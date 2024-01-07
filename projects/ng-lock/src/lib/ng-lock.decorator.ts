@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export const NG_UNLOCK_CALLBACK = 'ngUnlockCallback';
-export const NG_ISLOCK_CALLBACK = 'ngIslockCallback';
+export const NG_ISLOCK_CALLBACK = 'ngIsLockCallback';
 export type NG_CALLBACKS = typeof NG_UNLOCK_CALLBACK | typeof NG_ISLOCK_CALLBACK;
 export const NG_LOCK_LOCKED_CLASS = 'ng-lock-locked'
 
@@ -19,7 +20,7 @@ export type NgLockElementFinder = (self: any, args: any[]) => Element;
  * @returns Return a NgLockElementFinder function
  */
 export const ngLockElementByQuerySelector: NgLockElementFunction = (selector: string): NgLockElementFinder => {
-    // eslint-disable-next-line no-unused-vars
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
     return (self: any, args: any[]): Element => {
         if (!selector) {
             throw new Error('selector is required');
@@ -47,7 +48,7 @@ export const ngLockElementByTargetEventArgument: NgLockElementFunction = (argsIn
         let arg: any;
         if (typeof argsIndex === 'number') {
             if (argsIndex < 0) {
-                throw new Error('argsIndex muth be grater than or equal 0');
+                throw new Error('argsIndex must be grater than or equal 0');
             } else {
                 if (args.length - 1 < argsIndex) {
                     throw new Error('argsIndex grater than arguments length');
@@ -88,7 +89,7 @@ export const ngLockElementByTargetEventArgument: NgLockElementFunction = (argsIn
  * @returns Return a NgLockElementFinder function
  */
 export const ngLockElementByComponentProperty: NgLockElementFunction = (property: string): NgLockElementFinder => {
-    // eslint-disable-next-line no-unused-vars
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
     return (self: any, args: any[]): Element => {
         if (!property) {
             throw new Error('Property is required');
@@ -155,6 +156,7 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
             _options = { ...NgLockDefaultOption, ...options };
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-inferrable-types
         let callCounter: number = 0;
         let timeoutHandle: number | null = null;
         let elementToLock: Element | null = null;
@@ -179,7 +181,7 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
             }
         };
 
-        const ngIslockCallback = (): boolean => {
+        const ngIsLockCallback = (): boolean => {
             return callCounter >= (_options as any)?.maxCall;
         };
 
@@ -187,7 +189,7 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
 
         descriptor.value = function (...args: any[]) {
 
-            if (ngIslockCallback()) {
+            if (ngIsLockCallback()) {
                 ngLockLog(`NgLock: method "${key}" locked at counter ${callCounter}`);
                 if (_options.returnLastResultWhenLocked) {
                     return lastResult;
@@ -199,7 +201,7 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
             if (_options.lockElementFunction) {
                 elementToLock = _options.lockElementFunction(this, args);
             }
-            if (ngIslockCallback()) {
+            if (ngIsLockCallback()) {
                 if (_options.lockClass && elementToLock) {
                     elementToLock.classList.add(_options.lockClass);
                 }
@@ -214,12 +216,11 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
                     ngUnlockCallback();
                 }, _options.unlockTimeout) as any;
             }
-
             return lastResult;
         };
 
         Object.defineProperty(descriptor.value, NG_UNLOCK_CALLBACK, { value: ngUnlockCallback, enumerable: true, writable: false });
-        Object.defineProperty(descriptor.value, NG_ISLOCK_CALLBACK, { value: ngIslockCallback, enumerable: true, writable: false });
+        Object.defineProperty(descriptor.value, NG_ISLOCK_CALLBACK, { value: ngIsLockCallback, enumerable: true, writable: false });
 
         return descriptor;
     };
@@ -231,6 +232,7 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
  * @return void
  * @throws Error
  */
+// eslint-disable-next-line @typescript-eslint/ban-types
 export function ngUnlock(fn: Function): void {
     const callback = ngCallbacks(fn, NG_UNLOCK_CALLBACK);
     callback();
@@ -256,7 +258,8 @@ export function ngUnlockAll(self: any): void {
  * @return boolean
  * @throws Error
  */
-export function ngIslock(fn: Function): boolean {
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function ngIsLock(fn: Function): boolean {
     const callback = ngCallbacks(fn, NG_ISLOCK_CALLBACK);
     return callback();
 }
@@ -268,6 +271,7 @@ export function ngIslock(fn: Function): boolean {
  * @return Return the NG_CALLBACKS
  * @throws Error
  */
+// eslint-disable-next-line @typescript-eslint/ban-types
 export function ngCallbacks(fn: Function, callback: NG_CALLBACKS): Function {
     if (!(fn instanceof Function)) {
         throw new Error('"fn" param must be a function.');

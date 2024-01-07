@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Component, ViewChild } from '@angular/core';
 import { ngLock, ngLockElementByComponentProperty, ngLockElementByQuerySelector, ngUnlock } from 'projects/ng-lock/src/public-api';
 
-
+const sleep = (time: number) => new Promise(resolve => setTimeout(resolve, time));
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'app-root',
@@ -12,16 +13,18 @@ export class AppComponent {
   @ViewChild("button3") button3 = null;
 
   @ngLock()
-  // eslint-disable-next-line no-unused-vars
-  test1(e: MouseEvent) {
-    setTimeout(() => {
+  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+  async test1(e: MouseEvent) {
+    try {
+      await sleep(1000);
       console.log("test1");
+    } finally {
       ngUnlock(this.test1);
-    }, 1000);
+    }
   }
 
   @ngLock({ unlockTimeout: 3000 })
-  // eslint-disable-next-line no-unused-vars
+  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
   test2(e: any) {
     setTimeout(() => {
       console.log("test2");
