@@ -232,7 +232,7 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
  * @return void
  * @throws Error
  */
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export function ngUnlock(fn: Function): void {
     const callback = ngCallbacks(fn, NG_UNLOCK_CALLBACK);
     callback();
@@ -258,7 +258,7 @@ export function ngUnlockAll(self: any): void {
  * @return boolean
  * @throws Error
  */
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export function ngIsLock(fn: Function): boolean {
     const callback = ngCallbacks(fn, NG_ISLOCK_CALLBACK);
     return callback();
@@ -271,7 +271,7 @@ export function ngIsLock(fn: Function): boolean {
  * @return Return the NG_CALLBACKS
  * @throws Error
  */
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export function ngCallbacks(fn: Function, callback: NG_CALLBACKS): Function {
     if (!(fn instanceof Function)) {
         throw new Error('"fn" param must be a function.');

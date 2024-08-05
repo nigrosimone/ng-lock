@@ -58,12 +58,15 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/ng-lock-demo",
+            "outputPath": {
+              "base": "dist/ng-lock-demo"
+            },
             "index": "projects/ng-lock-demo/src/index.html",
-            "main": "projects/ng-lock-demo/src/main.ts",
-            "polyfills": "projects/ng-lock-demo/src/polyfills.ts",
+            "polyfills": [
+              "projects/ng-lock-demo/src/polyfills.ts"
+            ],
             "tsConfig": "projects/ng-lock-demo/tsconfig.app.json",
             "inlineStyleLanguage": "sass",
             "assets": [
@@ -73,7 +76,8 @@
             "styles": [
               "projects/ng-lock-demo/src/styles.sass"
             ],
-            "scripts": []
+            "scripts": [],
+            "browser": "projects/ng-lock-demo/src/main.ts"
           },
           "configurations": {
             "production": {
@@ -98,9 +102,7 @@
               "outputHashing": "all"
             },
             "development": {
-              "buildOptimizer": false,
               "optimization": false,
-              "vendorChunk": true,
               "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true
