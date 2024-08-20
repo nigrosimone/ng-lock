@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { HttpClient } from '@angular/common/http';
 import { Component, ViewChild } from '@angular/core';
-import { ngLock, ngLockElementByComponentProperty, ngLockElementByQuerySelector, ngUnlock } from 'projects/ng-lock/src/public-api';
+import { ngLock, ngLockElementByComponentProperty, ngLockElementByQuerySelector, ngUnlock, withNgLockContext } from 'projects/ng-lock/src/public-api';
 
 const sleep = (time: number) => new Promise(resolve => setTimeout(resolve, time));
 @Component({
@@ -11,6 +12,8 @@ const sleep = (time: number) => new Promise(resolve => setTimeout(resolve, time)
 })
 export class AppComponent {
   @ViewChild("button3") button3 = null;
+
+  constructor(private http: HttpClient) { }
 
   @ngLock()
   // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
@@ -31,8 +34,8 @@ export class AppComponent {
     }, 1000);
   }
 
-  @ngLock({ 
-    unlockTimeout: 3000, 
+  @ngLock({
+    unlockTimeout: 3000,
     lockElementFunction: ngLockElementByComponentProperty("button3"),
   })
   test3() {
@@ -41,9 +44,9 @@ export class AppComponent {
     }, 1000);
   }
 
-  @ngLock({ 
-    unlockTimeout: 3000, 
-    lockElementFunction: ngLockElementByQuerySelector("#button4"), 
+  @ngLock({
+    unlockTimeout: 3000,
+    lockElementFunction: ngLockElementByQuerySelector("#button4"),
   })
   test4() {
     setTimeout(() => {
@@ -51,8 +54,8 @@ export class AppComponent {
     }, 1000);
   }
 
-  @ngLock({ 
-    unlockTimeout: 3000, 
+  @ngLock({
+    unlockTimeout: 3000,
     lockElementFunction: ngLockElementByQuerySelector(".button5")
   })
   test5() {
@@ -102,5 +105,13 @@ export class AppComponent {
         resolve(true);
       }, 3000);
     });
+  }
+
+  @ngLock()
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  test10(e: MouseEvent) {
+    this.http.get('https://my-json-server.typicode.com/typicode/demo/db', {
+      context: withNgLockContext({ methodToUnlock: this.test10 })
+    }).subscribe()
   }
 }

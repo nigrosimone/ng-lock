@@ -17,15 +17,45 @@ See the [stackblitz demo](https://stackblitz.com/edit/demo-ng-lock?file=src%2Fap
 npm i ng-lock
 ```
 
-*Step 2*: Decorate a function with `@ngLock()` decorator, eg.:
+*Step 2*: Import `NgLockModule` into your app module, eg.:
+
+```ts
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { HttpClientModule } from '@angular/common/http';
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+
+import { NgLockModule } from 'ng-lock';
+
+@NgModule({
+  declarations: [AppComponent],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    HttpClientModule,
+    NgLockModule,
+  ],
+  providers: [],
+  bootstrap: [AppComponent],
+  ],
+})
+export class AppModule { }
+```
+
+*Step 3*: Decorate a function with `@ngLock()` decorator, eg.:
 
 ```ts
 import { Component } from '@angular/core';
-import { ngLock, ngUnlock } from 'ng-lock';
+import { HttpClient } from '@angular/common/http';
+import { ngLock, ngUnlock, withNgLockContext } from 'ng-lock';
 
 @Component({
   selector: 'app-root',
-  template: `<button (click)="onClick($event)">Click me!</button>`,
+  template: `
+    <button (click)="onTask($event)">Click me!</button>
+    <button (click)="onHttpRequest($event)">Click me!</button>
+  `,
   styles: [`
     button.ng-lock-locked {
       pointer-events: none; // disable all event on element
@@ -37,26 +67,39 @@ import { ngLock, ngUnlock } from 'ng-lock';
 })
 export class AppComponent {
 
+  constructor(private http: HttpClient) { }
+
   /**
-   * @ngLock() apply "ng-lock-locked" class on first call and remove it on "ngUnlock(this.onClick)"
+   * @ngLock() apply "ng-lock-locked" class on first call and remove it on "ngUnlock(this.onTask)"
    */
   @ngLock()
-  onClick(event: MouseEvent){
+  onTask(event: MouseEvent){
     // ...simulate async long task
     setTimeout(() => {
       // task ended
       console.log("task ended");
       // unlock the method and remove "ng-lock-locked" class on the button
-      ngUnlock(this.onClick);
+      ngUnlock(this.onTask);
     }, 3000);
   }
 
+  /**
+   * @ngLock() apply "ng-lock-locked" class on first call and remove it on HTTP response
+   */
+  @ngLock()
+  onHttpRequest(event: MouseEvent){
+    this.http.get('https://my-json-server.typicode.com/typicode/demo/db', {
+      context: withNgLockContext({ methodToUnlock: this.onHttpRequest })
+    }).subscribe(response => {
+       console.log("response", response);
+    })
+  }
 }
 ```
 
 ## NgLock options
 
-There are some optional options can be injectet into the `@ngLock()` decorator. This is an example with the default configuration:
+There are some optional options can be injected into the `@ngLock()` decorator. This is an example with the default configuration:
 
 ```ts
 import { Component } from '@angular/core';
@@ -246,7 +289,7 @@ import { ngLock, ngUnlock, NgLockElementFunction, NgLockElementFinder } from 'ng
 
 const myLockElementFunction: NgLockElementFunction = (): NgLockElementFinder => {
   /**
-   * @param self Is a component istance (in this example AppComponent).
+   * @param self Is a component instance (in this example AppComponent).
    * @param args Is a @ngLock() decorated function arguments (in this example onClick()).
    */
   return (self: any, args: any[]): Element => {
@@ -286,7 +329,7 @@ export class AppComponent {
 ## Utils function
 
 Utils function exported by `ng-lock` library
-### nglock(options?: NgLockOption): MethodDecorator
+### ngLock(options?: NgLockOption): MethodDecorator
 
 Lock the provided function. Usage as decorator eg.:
 
@@ -322,7 +365,7 @@ onClick(){
 
 ### ngUnlockAll(self: any): void
 
-Unlock all locked functions by `ngLock()` decorator. Argument `self` is the component istance (`this`). Usage, eg.:
+Unlock all locked functions by `ngLock()` decorator. Argument `self` is the component instance (`this`). Usage, eg.:
 
 ```ts
 @ngLock()
