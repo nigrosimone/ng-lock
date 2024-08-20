@@ -120,4 +120,19 @@ export class AppComponent {
   test11(e: MouseEvent) {
     this.http.get('https://my-json-server.typicode.com/typicode/demo/db').pipe(ngLockFinalize(this.test11)).subscribe()
   }
+
+  @ngLock()
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async test12(e: MouseEvent) {
+    await sleep(1000);
+    return 3;
+  }
+
+  @ngLock()
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  test13(e: MouseEvent) {
+    return new Promise(resolve => {
+      setTimeout(() => resolve(3), 1000)
+    });
+  }
 }

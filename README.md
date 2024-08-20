@@ -54,8 +54,8 @@ import { ngLock, ngUnlock, withNgLockContext, ngLockFinalize } from 'ng-lock';
   selector: 'app-root',
   template: `
     <button (click)="onTask($event)">Click me!</button>
-    <button (click)="onHttpRequest($event)">Click me!</button>
-    <button (click)="onHttpRequest2($event)">Click me!</button>
+    <button (click)="onHttpRequestContext($event)">Click me!</button>
+    <button (click)="onHttpRequestObservable($event)">Click me!</button>
   `,
   styles: [`
     button.ng-lock-locked {
@@ -88,19 +88,21 @@ export class AppComponent {
    * @ngLock() apply "ng-lock-locked" class on first call and remove it on HTTP response
    */
   @ngLock()
-  onHttpRequest(event: MouseEvent){
+  onHttpRequestContext(event: MouseEvent){
     this.http.get('https://my-json-server.typicode.com/typicode/demo/db', {
-      context: withNgLockContext({ methodToUnlock: this.onHttpRequest })
+      context: withNgLockContext({ methodToUnlock: this.onHttpRequestContext })
     }).subscribe(response => {
        console.log("response", response);
     })
   }
 
+  /**
+   * @ngLock() apply "ng-lock-locked" class on first call and remove it on observable finalization
+   */
   @ngLock()
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onHttpRequest2(e: MouseEvent) {
+  onHttpRequestObservable(e: MouseEvent) {
     this.http.get('https://my-json-server.typicode.com/typicode/demo/db')
-    .pipe(ngLockFinalize(this.onHttpRequest2))
+    .pipe(ngLockFinalize(this.onHttpRequestObservable)) // or ngLockChanges
     .subscribe(response => {
        console.log("response", response);
     })
@@ -139,6 +141,7 @@ export class AppComponent {
     lockElementFunction: ngLockElementByTargetEventArgument(),
     lockClass: 'ng-lock-locked',
     returnLastResultWhenLocked: false,
+    unlockOnPromiseResolve: true,
     debug: false
   })
   onClick(event: MouseEvent){
@@ -162,6 +165,7 @@ The options are:
 | *lockClass*                  | CSS class applied when the method is locked                                                    | `'ng-lock-locked'`                     |
 | *lockElementFunction*        | function for find the HTML element for apply the *lockClass*                                   | `ngLockElementByTargetEventArgument()` |
 | *returnLastResultWhenLocked* | if `true`, when the method is locked the last result is returned, otherwise return `undefined` | `false`                                |
+| *unlockOnPromiseResolve*     | if `true`, when a locked method return a Promise, the method is automatically unlock when the Promise is resolved| `true`                                |
 | *debug*                      | if `true`, the decorator log into the console some info                                        | `false`                                |
 
 ### Available lockElementFunction

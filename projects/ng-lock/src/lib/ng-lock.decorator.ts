@@ -116,6 +116,7 @@ export const ngLockElementByComponentProperty: NgLockElementFunction = (property
  *  - lockElementFunction: function for find the HTMLElement for apply the lockClass
  *  - lockClass: CSS class applied when the method is locked
  *  - returnLastResultWhenLocked: if true, when the method is locked the last result is returned, otherwise return undefined
+ *  - unlockOnPromiseResolve: if true, when a locked method return a Promise, the method is automatically unlock when the Promise is resolved
  *  - debug: if true, the decorator log into the console some info
  * @see NgLockDefaultOption for the default value
  */
@@ -125,6 +126,7 @@ export interface NgLockOption {
     lockElementFunction?: NgLockElementFinder;
     lockClass?: string;
     returnLastResultWhenLocked?: boolean;
+    unlockOnPromiseResolve?: boolean;
     debug?: boolean;
 }
 
@@ -138,6 +140,7 @@ export const NgLockDefaultOption: NgLockOption = {
     lockElementFunction: ngLockElementByTargetEventArgument(),
     lockClass: NG_LOCK_LOCKED_CLASS,
     returnLastResultWhenLocked: false,
+    unlockOnPromiseResolve: true,
     debug: false
 };
 
@@ -216,6 +219,11 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
                     ngUnlockCallback();
                 }, _options.unlockTimeout) as any;
             }
+
+            if (_options.unlockOnPromiseResolve && lastResult && typeof lastResult.finally === 'function' && typeof lastResult.then === 'function' && lastResult[Symbol.toStringTag] === 'Promise') {
+                (lastResult as Promise<any>).finally(() => ngUnlockCallback());
+            }
+
             return lastResult;
         };
 
