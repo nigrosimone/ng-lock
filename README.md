@@ -48,13 +48,14 @@ export class AppModule { }
 ```ts
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ngLock, ngUnlock, withNgLockContext } from 'ng-lock';
+import { ngLock, ngUnlock, withNgLockContext, ngLockFinalize } from 'ng-lock';
 
 @Component({
   selector: 'app-root',
   template: `
     <button (click)="onTask($event)">Click me!</button>
     <button (click)="onHttpRequest($event)">Click me!</button>
+    <button (click)="onHttpRequest2($event)">Click me!</button>
   `,
   styles: [`
     button.ng-lock-locked {
@@ -91,6 +92,16 @@ export class AppComponent {
     this.http.get('https://my-json-server.typicode.com/typicode/demo/db', {
       context: withNgLockContext({ methodToUnlock: this.onHttpRequest })
     }).subscribe(response => {
+       console.log("response", response);
+    })
+  }
+
+  @ngLock()
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onHttpRequest2(e: MouseEvent) {
+    this.http.get('https://my-json-server.typicode.com/typicode/demo/db')
+    .pipe(ngLockFinalize(this.onHttpRequest2))
+    .subscribe(response => {
        console.log("response", response);
     })
   }
