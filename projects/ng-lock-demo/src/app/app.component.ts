@@ -118,7 +118,7 @@ export class AppComponent {
   @ngLock()
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   test11(e: MouseEvent) {
-    this.http.get('https://my-json-server.typicode.com/typicode/demo/db').pipe(ngLockFinalize(this.test11)).subscribe()
+    this.http.get('https://my-json-server.typicode.com/typicode/demo/db').pipe(ngLockFinalize(this.test11)).subscribe(console.log)
   }
 
   @ngLock()

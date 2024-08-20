@@ -8,9 +8,16 @@ import { ngUnlock } from "./ng-lock.decorator";
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export function ngLockFinalize(methodToUnlock: Function) {
     return function <T>(source: Observable<T>): Observable<T> {
-        return new Observable(() => {
+        return new Observable((subscriber) => {
             source.subscribe({
+                next(value) {
+                    subscriber.next(value);
+                },
+                error(error) {
+                    subscriber.error(error);
+                },
                 complete() {
+                    subscriber.complete();
                     ngUnlock(methodToUnlock)
                 }
             })
@@ -25,15 +32,18 @@ export function ngLockFinalize(methodToUnlock: Function) {
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export function ngLockChanges(methodToUnlock: Function) {
     return function <T>(source: Observable<T>): Observable<T> {
-        return new Observable(() => {
+        return new Observable((subscriber) => {
             source.subscribe({
-                error() {
+                next(value) {
+                    subscriber.next(value);
                     ngUnlock(methodToUnlock)
                 },
-                next() {
+                error(error) {
+                    subscriber.error(error);
                     ngUnlock(methodToUnlock)
                 },
                 complete() {
+                    subscriber.complete();
                     ngUnlock(methodToUnlock)
                 }
             })
