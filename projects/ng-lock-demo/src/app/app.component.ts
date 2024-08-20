@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpClient } from '@angular/common/http';
 import { Component, ViewChild } from '@angular/core';
-import { ngLock, ngLockElementByComponentProperty, ngLockElementByQuerySelector, ngUnlock, withNgLockContext } from 'projects/ng-lock/src/public-api';
+import { ngLock, ngLockElementByComponentProperty, ngLockElementByQuerySelector, ngLockFinalize, ngUnlock, withNgLockContext } from 'projects/ng-lock/src/public-api';
 
 const sleep = (time: number) => new Promise(resolve => setTimeout(resolve, time));
 @Component({
@@ -113,5 +113,11 @@ export class AppComponent {
     this.http.get('https://my-json-server.typicode.com/typicode/demo/db', {
       context: withNgLockContext({ methodToUnlock: this.test10 })
     }).subscribe()
+  }
+
+  @ngLock()
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  test11(e: MouseEvent) {
+    this.http.get('https://my-json-server.typicode.com/typicode/demo/db').pipe(ngLockFinalize(this.test11)).subscribe()
   }
 }
