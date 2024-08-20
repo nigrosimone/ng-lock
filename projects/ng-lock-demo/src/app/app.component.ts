@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpClient } from '@angular/common/http';
 import { Component, ViewChild } from '@angular/core';
-import { ngLock, ngLockElementByComponentProperty, ngLockElementByQuerySelector, ngLockFinalize, ngUnlock, withNgLockContext } from 'projects/ng-lock/src/public-api';
+import { ngLockChanges } from 'ng-lock';
+import { ngLock, ngLockElementByComponentProperty, ngLockElementByQuerySelector, ngUnlock, withNgLockContext } from 'projects/ng-lock/src/public-api';
+import { delay } from 'rxjs';
 
 const sleep = (time: number) => new Promise(resolve => setTimeout(resolve, time));
 @Component({
@@ -109,30 +111,37 @@ export class AppComponent {
 
   @ngLock()
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  test10(e: MouseEvent) {
+  httpContext(e: MouseEvent) {
     this.http.get('https://my-json-server.typicode.com/typicode/demo/db', {
-      context: withNgLockContext({ methodToUnlock: this.test10 })
-    }).subscribe()
+      context: withNgLockContext(this.httpContext)
+    })
+      .pipe(delay(1000))
+      .subscribe(response => console.log(this.httpContext.name, response))
   }
 
   @ngLock()
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  test11(e: MouseEvent) {
-    this.http.get('https://my-json-server.typicode.com/typicode/demo/db').pipe(ngLockFinalize(this.test11)).subscribe(console.log)
+  observableChanges(e: MouseEvent) {
+    this.http.get('https://my-json-server.typicode.com/typicode/demo/db')
+      .pipe(delay(1000), ngLockChanges(this.observableChanges))
+      .subscribe(response => console.log(this.observableChanges.name, response))
   }
 
   @ngLock()
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async test12(e: MouseEvent) {
+  async asyncMethod(e: MouseEvent) {
     await sleep(1000);
-    return 3;
+    console.log(this.asyncMethod.name, 'done')
   }
 
   @ngLock()
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  test13(e: MouseEvent) {
+  promiseMethod(e: MouseEvent) {
     return new Promise(resolve => {
-      setTimeout(() => resolve(3), 1000)
+      setTimeout(() => {
+        console.log(this.promiseMethod.name, 'done')
+        resolve(true);
+      }, 1000)
     });
   }
 }

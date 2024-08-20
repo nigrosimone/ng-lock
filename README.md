@@ -48,7 +48,7 @@ export class AppModule { }
 ```ts
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ngLock, ngUnlock, withNgLockContext, ngLockFinalize } from 'ng-lock';
+import { ngLock, ngUnlock, withNgLockContext, ngLockChanges } from 'ng-lock';
 
 @Component({
   selector: 'app-root',
@@ -91,10 +91,8 @@ export class AppComponent {
   @ngLock()
   onHttpRequestContext(event: MouseEvent){
     this.http.get('https://my-json-server.typicode.com/typicode/demo/db', {
-      context: withNgLockContext({ methodToUnlock: this.onHttpRequestContext })
-    }).subscribe(response => {
-       console.log("response", response);
-    })
+      context: withNgLockContext(this.onHttpRequestContext)
+    }).subscribe(response => console.log("onHttpRequestContext", response))
   }
 
   /**
@@ -103,10 +101,8 @@ export class AppComponent {
   @ngLock()
   onHttpRequestObservable(e: MouseEvent) {
     this.http.get('https://my-json-server.typicode.com/typicode/demo/db')
-    .pipe(ngLockFinalize(this.onHttpRequestObservable)) // or ngLockChanges
-    .subscribe(response => {
-       console.log("response", response);
-    })
+      .pipe(ngLockChanges(this.onHttpRequestObservable))
+      .subscribe(response => console.log("onHttpRequestObservable", response))
   }
 
   /**
