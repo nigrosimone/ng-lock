@@ -56,6 +56,7 @@ import { ngLock, ngUnlock, withNgLockContext, ngLockFinalize } from 'ng-lock';
     <button (click)="onTask($event)">Click me!</button>
     <button (click)="onHttpRequestContext($event)">Click me!</button>
     <button (click)="onHttpRequestObservable($event)">Click me!</button>
+    <button (click)="onHttpRequestAsync($event)">Click me!</button>
   `,
   styles: [`
     button.ng-lock-locked {
@@ -106,6 +107,15 @@ export class AppComponent {
     .subscribe(response => {
        console.log("response", response);
     })
+  }
+
+  /**
+   * @ngLock() apply "ng-lock-locked" class on first call and remove it on promise resolve
+   */
+  @ngLock()
+  async onHttpRequestAsync(e: MouseEvent) {
+    await sleep(1000);
+    console.log('onHttpRequestAsync', 'done');
   }
 }
 ```
