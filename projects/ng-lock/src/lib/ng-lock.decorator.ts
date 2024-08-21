@@ -1,3 +1,5 @@
+import { Subscriber } from "rxjs";
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const NG_UNLOCK_CALLBACK = 'ngUnlockCallback';
 export const NG_ISLOCK_CALLBACK = 'ngIsLockCallback';
@@ -117,6 +119,7 @@ export const ngLockElementByComponentProperty: NgLockElementFunction = (property
  *  - lockClass: CSS class applied when the method is locked
  *  - returnLastResultWhenLocked: if true, when the method is locked the last result is returned, otherwise return undefined
  *  - unlockOnPromiseResolve: if true, when a locked method return a Promise, the method is automatically unlock when the Promise is resolved
+ *  - unlockOnObservableChanges: if true, when a locked method return a subscription, the method is automatically unlock when the observable changes
  *  - debug: if true, the decorator log into the console some info
  * @see NgLockDefaultOption for the default value
  */
@@ -127,6 +130,7 @@ export interface NgLockOption {
     lockClass?: string;
     returnLastResultWhenLocked?: boolean;
     unlockOnPromiseResolve?: boolean;
+    unlockOnObservableChanges?: boolean;
     debug?: boolean;
 }
 
@@ -141,6 +145,7 @@ export const NgLockDefaultOption: NgLockOption = {
     lockClass: NG_LOCK_LOCKED_CLASS,
     returnLastResultWhenLocked: false,
     unlockOnPromiseResolve: true,
+    unlockOnObservableChanges: true,
     debug: false
 };
 
@@ -221,9 +226,38 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
             }
 
             if (_options.unlockOnPromiseResolve && lastResult && typeof lastResult.finally === 'function' && typeof lastResult.then === 'function' && lastResult[Symbol.toStringTag] === 'Promise') {
-                (lastResult as Promise<any>).finally(() => ngUnlockCallback());
+                (lastResult as Promise<any>).finally(() => {
+                    ngLockLog(`NgLock: promise resolved for method "${key}"`);
+                    ngUnlockCallback()
+                });
             }
 
+            if (_options.unlockOnObservableChanges && lastResult && typeof lastResult?.destination?.partialObserver === 'object') {
+                const obsNext = (lastResult.destination.partialObserver as Subscriber<any>).next;
+                if (typeof obsNext === 'function') {
+                    (lastResult.destination.partialObserver as Subscriber<any>).next = (...args: any[]) => {
+                        ngLockLog(`NgLock: observable changes for method "${key}"`);
+                        ngUnlockCallback();
+                        obsNext(args);
+                    }
+                }
+                const obsError = (lastResult.destination.partialObserver as Subscriber<any>).error;
+                if (typeof obsError === 'function') {
+                    (lastResult.destination.partialObserver as Subscriber<any>).error = (...args: any[]) => {
+                        ngLockLog(`NgLock: observable error for method "${key}"`);
+                        ngUnlockCallback();
+                        obsError(args);
+                    }
+                }
+                const obsComplete = (lastResult.destination.partialObserver as Subscriber<any>).complete;
+                if (typeof obsComplete === 'function') {
+                    (lastResult.destination.partialObserver as Subscriber<any>).complete = () => {
+                        ngLockLog(`NgLock: observable complete for method "${key}"`);
+                        ngUnlockCallback();
+                        obsComplete();
+                    }
+                }
+            }
             return lastResult;
         };
 

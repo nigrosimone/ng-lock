@@ -50,6 +50,8 @@ import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ngLock, ngUnlock, withNgLockContext, ngLockChanges } from 'ng-lock';
 
+const sleep = (time: number) => new Promise(resolve => setTimeout(resolve, time));
+
 @Component({
   selector: 'app-root',
   template: `
@@ -57,6 +59,7 @@ import { ngLock, ngUnlock, withNgLockContext, ngLockChanges } from 'ng-lock';
     <button (click)="onHttpRequestContext($event)">Click me!</button>
     <button (click)="onHttpRequestObservable($event)">Click me!</button>
     <button (click)="onHttpRequestAsync($event)">Click me!</button>
+    <button (click)="onSubscriptionChanges($event)">Click me!</button>
   `,
   styles: [`
     button.ng-lock-locked {
@@ -113,6 +116,16 @@ export class AppComponent {
     await sleep(1000);
     console.log('onHttpRequestAsync', 'done');
   }
+
+  /**
+   * @ngLock() apply "ng-lock-locked" class on first call and remove on subscription changes
+   */
+  @ngLock()
+  onSubscriptionChanges(e: MouseEvent) {
+    return this.http.get('https://my-json-server.typicode.com/typicode/demo/db')
+      .pipe(delay(1000))
+      .subscribe(response => console.log('onSubscriptionChanges', response))
+  }
 }
 ```
 
@@ -148,6 +161,7 @@ export class AppComponent {
     lockClass: 'ng-lock-locked',
     returnLastResultWhenLocked: false,
     unlockOnPromiseResolve: true,
+    unlockOnObservableChanges: true,
     debug: false
   })
   onClick(event: MouseEvent){
@@ -172,6 +186,7 @@ The options are:
 | *lockElementFunction*        | function for find the HTML element for apply the *lockClass*                                   | `ngLockElementByTargetEventArgument()` |
 | *returnLastResultWhenLocked* | if `true`, when the method is locked the last result is returned, otherwise return `undefined` | `false`                                |
 | *unlockOnPromiseResolve*     | if `true`, when a locked method return a Promise, the method is automatically unlock when the Promise is resolved| `true`                                |
+| *unlockOnObservableChanges*  | if `true`, when a locked method return a subscription, the method is automatically unlock when the observable changes| `true` 
 | *debug*                      | if `true`, the decorator log into the console some info                                        | `false`                                |
 
 ### Available lockElementFunction

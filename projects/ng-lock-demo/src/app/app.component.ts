@@ -144,4 +144,12 @@ export class AppComponent {
       }, 1000)
     });
   }
+
+  @ngLock()
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  subscriptionCompleted(e: MouseEvent) {
+    return this.http.get('https://my-json-server.typicode.com/typicode/demo/db')
+      .pipe(delay(1000))
+      .subscribe(response => console.log(this.subscriptionCompleted.name, response))
+  }
 }
