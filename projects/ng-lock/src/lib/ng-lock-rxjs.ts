@@ -12,15 +12,15 @@ export function ngLockChanges(methodToUnlock: Function) {
             source.subscribe({
                 next(value) {
                     subscriber.next(value);
-                    ngUnlock(methodToUnlock)
+                    ngUnlock(methodToUnlock, 'Observable changes')
                 },
                 error(error) {
                     subscriber.error(error);
-                    ngUnlock(methodToUnlock)
+                    ngUnlock(methodToUnlock, 'Observable error')
                 },
                 complete() {
                     subscriber.complete();
-                    ngUnlock(methodToUnlock)
+                    ngUnlock(methodToUnlock, 'Observable complete')
                 }
             })
         });

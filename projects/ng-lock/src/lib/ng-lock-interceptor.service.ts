@@ -14,7 +14,7 @@ export class NgLockInterceptorService implements HttpInterceptor {
       finalize(() => {
         const context = req.context.get(NG_LOCK_CONTEXT);
         if (typeof context === 'function') {
-          ngUnlock(context)
+          ngUnlock(context, 'HTTP response')
         }
       })
     );

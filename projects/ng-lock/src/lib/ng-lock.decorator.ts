@@ -178,8 +178,13 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
             }
         }
 
-        const ngUnlockCallback = (): void => {
-            ngLockLog(`NgLock: unlock method "${key}" at counter ${callCounter}`);
+        const ngUnlockCallback = (log: string): void => {
+            let message = `NgLock: unlock method "${key}"`;
+            message += `, reason: ${log ?? 'ngUnlock'}`;
+            if (!ngIsLockCallback()) {
+                message += ' (warning! the method is already unlocked)';
+            }
+            ngLockLog(message);
             callCounter = 0;
             if (_options.lockClass && elementToLock) {
                 elementToLock.classList.remove(_options.lockClass);
@@ -198,7 +203,7 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
         descriptor.value = function (...args: any[]) {
 
             if (ngIsLockCallback()) {
-                ngLockLog(`NgLock: method "${key}" locked at counter ${callCounter}`);
+                ngLockLog(`NgLock: method "${key}" locked`);
                 if (_options.returnLastResultWhenLocked) {
                     return lastResult;
                 }
@@ -216,19 +221,17 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
             }
 
             lastResult = originalMethod.apply(this, args);
-            ngLockLog(`NgLock: execute method "${key}" at counter ${callCounter}`);
+            ngLockLog(`NgLock: execute method "${key}"`);
 
             if (_options.unlockTimeout) {
                 timeoutHandle = setTimeout(() => {
-                    ngLockLog(`NgLock: timeout reached for method "${key}"`);
-                    ngUnlockCallback();
+                    ngUnlockCallback('unlockTimeout reached');
                 }, _options.unlockTimeout) as any;
             }
 
             if (_options.unlockOnPromiseResolve && lastResult && typeof lastResult.finally === 'function' && typeof lastResult.then === 'function' && lastResult[Symbol.toStringTag] === 'Promise') {
                 (lastResult as Promise<any>).finally(() => {
-                    ngLockLog(`NgLock: promise resolved for method "${key}"`);
-                    ngUnlockCallback()
+                    ngUnlockCallback('Promise resolved');
                 });
             }
 
@@ -236,24 +239,21 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
                 const obsNext = (lastResult.destination.partialObserver as Subscriber<any>).next;
                 if (typeof obsNext === 'function') {
                     (lastResult.destination.partialObserver as Subscriber<any>).next = (...args: any[]) => {
-                        ngLockLog(`NgLock: observable changes for method "${key}"`);
-                        ngUnlockCallback();
+                        ngUnlockCallback('Subscription changes');
                         obsNext(args);
                     }
                 }
                 const obsError = (lastResult.destination.partialObserver as Subscriber<any>).error;
                 if (typeof obsError === 'function') {
                     (lastResult.destination.partialObserver as Subscriber<any>).error = (...args: any[]) => {
-                        ngLockLog(`NgLock: observable error for method "${key}"`);
-                        ngUnlockCallback();
+                        ngUnlockCallback('Subscription error');
                         obsError(args);
                     }
                 }
                 const obsComplete = (lastResult.destination.partialObserver as Subscriber<any>).complete;
                 if (typeof obsComplete === 'function') {
                     (lastResult.destination.partialObserver as Subscriber<any>).complete = () => {
-                        ngLockLog(`NgLock: observable complete for method "${key}"`);
-                        ngUnlockCallback();
+                        ngUnlockCallback('Subscription complete');
                         obsComplete();
                     }
                 }
@@ -275,9 +275,9 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
  * @throws Error
  */
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-export function ngUnlock(fn: Function): void {
+export function ngUnlock(fn: Function, reason?: string): void {
     const callback = ngCallbacks(fn, NG_UNLOCK_CALLBACK);
-    callback();
+    callback(reason);
 }
 
 /**
@@ -289,7 +289,7 @@ export function ngUnlockAll(self: any): void {
     Object.getOwnPropertyNames(self).forEach(key => {
         const prop = self[key];
         if (typeof prop === 'function' && typeof prop[NG_UNLOCK_CALLBACK] === 'function') {
-            prop[NG_UNLOCK_CALLBACK]();
+            prop[NG_UNLOCK_CALLBACK]('ngUnlockAll');
         }
     });
 }

@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpClient } from '@angular/common/http';
 import { Component, ViewChild } from '@angular/core';
-import { ngLockChanges } from 'ng-lock';
-import { ngLock, ngLockElementByComponentProperty, ngLockElementByQuerySelector, ngUnlock, withNgLockContext } from 'projects/ng-lock/src/public-api';
+import { ngLock, ngLockElementByComponentProperty, ngLockElementByQuerySelector, ngUnlock, withNgLockContext, ngLockChanges } from 'projects/ng-lock/src/public-api';
 import { delay } from 'rxjs';
 
 const sleep = (time: number) => new Promise(resolve => setTimeout(resolve, time));
@@ -17,7 +16,7 @@ export class AppComponent {
 
   constructor(private http: HttpClient) { }
 
-  @ngLock()
+  @ngLock({ debug: true })
   // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
   async test1(e: MouseEvent) {
     try {
@@ -28,7 +27,7 @@ export class AppComponent {
     }
   }
 
-  @ngLock({ unlockTimeout: 3000 })
+  @ngLock({ unlockTimeout: 3000, debug: true })
   // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
   test2(e: any) {
     setTimeout(() => {
@@ -39,6 +38,7 @@ export class AppComponent {
   @ngLock({
     unlockTimeout: 3000,
     lockElementFunction: ngLockElementByComponentProperty("button3"),
+    debug: true
   })
   test3() {
     setTimeout(() => {
@@ -49,6 +49,7 @@ export class AppComponent {
   @ngLock({
     unlockTimeout: 3000,
     lockElementFunction: ngLockElementByQuerySelector("#button4"),
+    debug: true
   })
   test4() {
     setTimeout(() => {
@@ -58,7 +59,8 @@ export class AppComponent {
 
   @ngLock({
     unlockTimeout: 3000,
-    lockElementFunction: ngLockElementByQuerySelector(".button5")
+    lockElementFunction: ngLockElementByQuerySelector(".button5"),
+    debug: true
   })
   test5() {
     setTimeout(() => {
@@ -67,7 +69,8 @@ export class AppComponent {
   }
 
   @ngLock({
-    lockElementFunction: null as any
+    lockElementFunction: null as any,
+    debug: true
   })
   test6(): void {
     (this.test6 as any).ngUnlockCallback();
@@ -82,7 +85,8 @@ export class AppComponent {
   }
 
   @ngLock({
-    lockElementFunction: ngLockElementByQuerySelector(".button8")
+    lockElementFunction: ngLockElementByQuerySelector(".button8"),
+    debug: true
   })
   async test8(): Promise<boolean> {
     return new Promise((resolve) => {
@@ -97,7 +101,8 @@ export class AppComponent {
   @ngLock({
     maxCall: 3,
     lockElementFunction: null as any,
-    returnLastResultWhenLocked: true
+    returnLastResultWhenLocked: true,
+    debug: true
   })
   test9(): Promise<boolean> {
     return new Promise((resolve) => {
@@ -109,7 +114,7 @@ export class AppComponent {
     });
   }
 
-  @ngLock()
+  @ngLock({ debug: true })
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   httpContext(e: MouseEvent) {
     this.http.get('https://my-json-server.typicode.com/typicode/demo/db', {
@@ -119,7 +124,7 @@ export class AppComponent {
       .subscribe(response => console.log(this.httpContext.name, response))
   }
 
-  @ngLock()
+  @ngLock({ debug: true })
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   observableChanges(e: MouseEvent) {
     this.http.get('https://my-json-server.typicode.com/typicode/demo/db')
@@ -127,14 +132,14 @@ export class AppComponent {
       .subscribe(response => console.log(this.observableChanges.name, response))
   }
 
-  @ngLock()
+  @ngLock({ debug: true })
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async asyncMethod(e: MouseEvent) {
     await sleep(1000);
     console.log(this.asyncMethod.name, 'done')
   }
 
-  @ngLock()
+  @ngLock({ debug: true })
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   promiseMethod(e: MouseEvent) {
     return new Promise(resolve => {
@@ -145,7 +150,7 @@ export class AppComponent {
     });
   }
 
-  @ngLock()
+  @ngLock({ debug: true })
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   subscriptionCompleted(e: MouseEvent) {
     return this.http.get('https://my-json-server.typicode.com/typicode/demo/db')
