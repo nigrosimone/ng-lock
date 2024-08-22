@@ -479,7 +479,7 @@ export class AppComponent {
   }
 
   onCheck(){
-    console.log('onClick lock state:', ngIslock(this.onClick));
+    console.log('onClick lock state:', ngIsLock(this.onClick));
   }
 }
 ```
@@ -489,7 +489,7 @@ Example of use with `maxCall` option, eg.:
 
 ```ts
 import { Component } from '@angular/core';
-import { ngLock, ngIslock, ngUnlock } from 'ng-lock';
+import { ngLock, ngIsLock, ngUnlock } from 'ng-lock';
 
 @Component({
   selector: 'app-root',
@@ -520,7 +520,7 @@ export class AppComponent {
   }
 
   onCheck(){
-    console.log('onClick lock state:', ngIslock(this.onClick));
+    console.log('onClick lock state:', ngIsLock(this.onClick));
   }
 
   onUnlock(){
