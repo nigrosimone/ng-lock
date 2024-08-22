@@ -11,7 +11,6 @@
 <button (click)="observableChanges($event)">observableChanges</button>
 <button (click)="asyncMethod($event)">asyncMethod</button>
 <button (click)="promiseMethod($event)">promiseMethod
-    {{promiseMethod$ | async}}
-    {{sigPromiseMethod() }}
+    {{(promiseMethod$ | async)}},{{ sigPromiseMethod() }}
 </button>
 <button (click)="subscriptionCompleted($event)">subscriptionCompleted </button>

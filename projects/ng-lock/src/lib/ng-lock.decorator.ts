@@ -3,16 +3,11 @@ import { BehaviorSubject, Observable, of, Subscriber } from "rxjs";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const NG_UNLOCK_CALLBACK = 'ngUnlockCallback';
-export const NG_ISLOCK_CALLBACK = 'ngIsLockCallback';
+export const NG_IS_LOCK_CALLBACK = 'ngIsLockCallback';
 export const NG_LOCK_SIGNAL = 'ngLockSignal';
 export const NG_LOCK_SUBJECT = 'ngLockSubject';
-export type NG_CALLBACKS = typeof NG_UNLOCK_CALLBACK | typeof NG_ISLOCK_CALLBACK | typeof NG_LOCK_SIGNAL | typeof NG_LOCK_SUBJECT;
-export const NG_LOCK_LOCKED_CLASS = 'ng-lock-locked'
-
-export interface NgLockDecoratedFunction {
-    [NG_UNLOCK_CALLBACK]?: () => void;
-    [NG_ISLOCK_CALLBACK]?: () => boolean;
-}
+export type NG_CALLBACKS = typeof NG_UNLOCK_CALLBACK | typeof NG_IS_LOCK_CALLBACK | typeof NG_LOCK_SIGNAL | typeof NG_LOCK_SUBJECT;
+export const NG_LOCK_LOCKED_CLASS = 'ng-lock-locked';
 
 // eslint-disable-next-line no-unused-vars
 export type NgLockElementFunction = (...args: any[]) => NgLockElementFinder;
@@ -273,10 +268,14 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
             return lastResult;
         };
 
-        Object.defineProperty(descriptor.value, NG_UNLOCK_CALLBACK, { value: ngUnlockCallback, enumerable: true, writable: false });
-        Object.defineProperty(descriptor.value, NG_ISLOCK_CALLBACK, { value: ngIsLockCallback, enumerable: true, writable: false });
-        Object.defineProperty(descriptor.value, NG_LOCK_SIGNAL, { value: () => ngLockSignal.asReadonly(), enumerable: true, writable: false });
-        Object.defineProperty(descriptor.value, NG_LOCK_SUBJECT, { value: () => ngLockSubject.asObservable(), enumerable: true, writable: false });
+        Object.defineProperty(descriptor.value, 'ngLock', {
+            value: {
+                [NG_UNLOCK_CALLBACK]: ngUnlockCallback,
+                [NG_IS_LOCK_CALLBACK]: ngIsLockCallback,
+                [NG_LOCK_SIGNAL]: ngLockSignal.asReadonly,
+                [NG_LOCK_SUBJECT]: ngLockSubject.asObservable,
+            }, enumerable: true, writable: false
+        });
 
         return descriptor;
     };
@@ -316,7 +315,7 @@ export function ngUnlockAll(self: any): void {
  */
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export function ngIsLock(fn: Function): boolean {
-    const callback = ngCallbacks(fn, NG_ISLOCK_CALLBACK);
+    const callback = ngCallbacks(fn, NG_IS_LOCK_CALLBACK);
     return callback();
 }
 
@@ -364,11 +363,14 @@ export function ngCallbacks(fn: Function, callback: NG_CALLBACKS): Function {
     if (!(fn instanceof Function)) {
         throw new Error('"fn" param must be a function.');
     }
-    if (callback !== NG_UNLOCK_CALLBACK && callback !== NG_ISLOCK_CALLBACK && callback !== NG_LOCK_SIGNAL && callback !== NG_LOCK_SUBJECT) {
+    if (callback !== NG_UNLOCK_CALLBACK && callback !== NG_IS_LOCK_CALLBACK && callback !== NG_LOCK_SIGNAL && callback !== NG_LOCK_SUBJECT) {
         throw new Error(`"callback" param "${callback}" must be a NG_CALLBACKS.`);
     }
-    if (typeof (fn as any)[callback as any] !== 'function') {
+    if (typeof (fn as any)['ngLock'] !== 'object') {
         throw new Error(`"fn" param (function ${fn.name}) must be a @ngLock() decorated function.`);
     }
-    return (fn as any)[callback];
+    if (typeof (fn as any)['ngLock'][callback as any] !== 'function') {
+        throw new Error(`"fn" param (function ${fn.name}) must be a @ngLock() decorated function with "${callback}".`);
+    }
+    return (fn as any)['ngLock'][callback];
 }
