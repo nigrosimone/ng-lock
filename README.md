@@ -48,18 +48,31 @@ export class AppModule { }
 ```ts
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ngLock, ngUnlock, withNgLockContext, ngLockChanges } from 'ng-lock';
+import { ngLock, ngUnlock, withNgLockContext, ngLockChanges, ngLockSignal, ngLockObservable } from 'ng-lock';
 
 const sleep = (time: number) => new Promise(resolve => setTimeout(resolve, time));
 
 @Component({
   selector: 'app-root',
   template: `
-    <button (click)="onTask($event)">Click me!</button>
-    <button (click)="onHttpRequestContext($event)">Click me!</button>
-    <button (click)="onHttpRequestObservable($event)">Click me!</button>
-    <button (click)="onHttpRequestAsync($event)">Click me!</button>
-    <button (click)="onSubscriptionChanges($event)">Click me!</button>
+    <h2>Examples</h2>
+    <hr />
+    Disable the button on click and enable when <b>ngUnlock</b> is called<br>
+    <button (click)="onClick($event)">Click me</button>
+    <hr />
+    Disable the button on click and enable when <b>HTTP</b> request is completed<br>
+    <button (click)="onHttpRequestContext($event)">Click me</button>
+    <hr />
+    Disable the button on click and enable when <b>Observable</b> changes<br>
+    <button (click)="onHttpRequestObservable($event)">Click me</button>
+    <hr />
+    Disable the button on click and enable when <b>Promise</b> is resolved<br>
+    <button (click)="onAsync($event)">Click me</button><br>
+    Signal: {{ sigAsyncMethod() }}, Observable: {{ asyncMethod$ | async }}
+    <hr />
+    Disable the button on click and enable when <b>Subscription</b> changes<br>
+    <button (click)="onSubscriptionChanges($event)">Click me</button>
+    <hr />
   `,
   styles: [`
     button.ng-lock-locked {
@@ -67,64 +80,79 @@ const sleep = (time: number) => new Promise(resolve => setTimeout(resolve, time)
       border: 1px solid #999999;
       background-color: #cccccc;
       color: #666666;
+      user-select: none;
     }
   `]
 })
 export class AppComponent {
 
+  // if you want more control over the lock status of a decorated method,
+  // you can get a Signal and/or an Observable of a given method,
+  // the status: when true is locked; when false is unlocked.
+  public sigAsyncMethod: Signal<boolean> = ngLockSignal(this.onAsync);
+  public asyncMethod$: Observable<boolean> = ngLockObservable(this.onAsync);
+  
   constructor(private http: HttpClient) { }
 
   /**
-   * @ngLock() apply "ng-lock-locked" class on first call and remove it on "ngUnlock(this.onTask)"
+   * @ngLock() apply "ng-lock-locked" class on first call and remove it on `ngUnlock(this.onClick)`
    */
-  @ngLock()
-  onTask(event: MouseEvent){
-    // ...simulate async long task
+  @ngLock({ debug: isDevMode() })
+  onClick(e: MouseEvent) {
     setTimeout(() => {
-      // task ended
-      console.log("task ended");
-      // unlock the method and remove "ng-lock-locked" class on the button
-      ngUnlock(this.onTask);
-    }, 3000);
+      ngUnlock(this.onClick);
+      console.log('onClick', 'done');
+    }, 1000);
   }
 
   /**
-   * @ngLock() apply "ng-lock-locked" class on first call and remove it on HTTP response
+   * @ngLock() apply "ng-lock-locked" class on first call and remove it on HTTP response (@see withNgLockContext)
    */
-  @ngLock()
-  onHttpRequestContext(event: MouseEvent){
-    this.http.get('https://my-json-server.typicode.com/typicode/demo/db', {
-      context: withNgLockContext(this.onHttpRequestContext)
-    }).subscribe(response => console.log("onHttpRequestContext", response))
+  @ngLock({ debug: isDevMode() })
+  onHttpRequestContext(e: MouseEvent) {
+    this.http
+      .get('https://my-json-server.typicode.com/typicode/demo/db', {
+        context: withNgLockContext(this.onHttpRequestContext),
+      })
+      .pipe(delay(1000))
+      .subscribe((response) => {
+        console.log('onHttpRequestContext', response);
+      });
   }
 
   /**
-   * @ngLock() apply "ng-lock-locked" class on first call and remove it on observable finalization
+   * @ngLock() apply "ng-lock-locked" class on first call and remove it on observable changes (@see ngLockChanges)
    */
-  @ngLock()
+  @ngLock({ debug: isDevMode() })
   onHttpRequestObservable(e: MouseEvent) {
-    this.http.get('https://my-json-server.typicode.com/typicode/demo/db')
-      .pipe(ngLockChanges(this.onHttpRequestObservable))
-      .subscribe(response => console.log("onHttpRequestObservable", response))
+    this.http
+      .get('https://my-json-server.typicode.com/typicode/demo/db')
+      .pipe(delay(1000), ngLockChanges(this.onHttpRequestObservable))
+      .subscribe((response) => {
+        console.log('onHttpRequestObservable', response);
+      });
   }
 
   /**
    * @ngLock() apply "ng-lock-locked" class on first call and remove it on promise resolve
    */
-  @ngLock()
-  async onHttpRequestAsync(e: MouseEvent) {
+  @ngLock({ debug: isDevMode() })
+  async onAsync(e: MouseEvent) {
+    // async method or that return a Promise is handled automatic unlock when resolve
     await sleep(1000);
-    console.log('onHttpRequestAsync', 'done');
+    console.log('onAsync', 'done');
   }
 
   /**
    * @ngLock() apply "ng-lock-locked" class on first call and remove on subscription changes
    */
-  @ngLock()
+  @ngLock({ debug: isDevMode() })
   onSubscriptionChanges(e: MouseEvent) {
-    return this.http.get('https://my-json-server.typicode.com/typicode/demo/db')
+    // method that return a Subscription is handled automatic unlock when changes
+    return this.http
+      .get('https://my-json-server.typicode.com/typicode/demo/db')
       .pipe(delay(1000))
-      .subscribe(response => console.log('onSubscriptionChanges', response))
+      .subscribe((response) => console.log('onSubscriptionChanges', response));
   }
 }
 ```
