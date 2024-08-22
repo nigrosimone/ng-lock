@@ -10,5 +10,8 @@
 <button (click)="httpContext($event)">HttpContext</button>
 <button (click)="observableChanges($event)">observableChanges</button>
 <button (click)="asyncMethod($event)">asyncMethod</button>
-<button (click)="promiseMethod($event)">promiseMethod</button>
-<button (click)="subscriptionCompleted($event)">subscriptionCompleted</button>
+<button (click)="promiseMethod($event)">promiseMethod
+    {{promiseMethod$ | async}}
+    {{sigPromiseMethod() }}
+</button>
+<button (click)="subscriptionCompleted($event)">subscriptionCompleted </button>

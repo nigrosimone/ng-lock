@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpClient } from '@angular/common/http';
-import { Component, ViewChild } from '@angular/core';
-import { ngLock, ngLockElementByComponentProperty, ngLockElementByQuerySelector, ngUnlock, withNgLockContext, ngLockChanges } from 'projects/ng-lock/src/public-api';
-import { delay } from 'rxjs';
+import { Component, Signal, ViewChild } from '@angular/core';
+import { ngLock, ngLockElementByComponentProperty, ngLockElementByQuerySelector, ngUnlock, withNgLockContext, ngLockChanges, ngLockSignal, ngLockObservable } from 'projects/ng-lock/src/public-api';
+import { delay, Observable } from 'rxjs';
 
 const sleep = (time: number) => new Promise(resolve => setTimeout(resolve, time));
 @Component({
@@ -14,6 +14,9 @@ const sleep = (time: number) => new Promise(resolve => setTimeout(resolve, time)
 export class AppComponent {
   @ViewChild("button3") button3 = null;
 
+  public sigPromiseMethod: Signal<boolean> = ngLockSignal(this.promiseMethod);
+  public promiseMethod$: Observable<boolean> = ngLockObservable(this.promiseMethod);
+  
   constructor(private http: HttpClient) { }
 
   @ngLock({ debug: true })
