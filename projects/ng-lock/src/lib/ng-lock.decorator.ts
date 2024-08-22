@@ -272,8 +272,8 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
             value: {
                 [NG_UNLOCK_CALLBACK]: ngUnlockCallback,
                 [NG_IS_LOCK_CALLBACK]: ngIsLockCallback,
-                [NG_LOCK_SIGNAL]: ngLockSignal.asReadonly,
-                [NG_LOCK_SUBJECT]: ngLockSubject.asObservable,
+                [NG_LOCK_SIGNAL]: () => ngLockSignal.asReadonly(),
+                [NG_LOCK_SUBJECT]: () => ngLockSubject.asObservable(),
             }, enumerable: true, writable: false
         });
 
