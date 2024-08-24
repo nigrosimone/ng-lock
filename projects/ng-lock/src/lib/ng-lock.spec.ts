@@ -9,22 +9,19 @@ async function sleep(ms: number) {
 }
 
 describe('NgLock Component', () => {
-    it('test 1', () => {
+    it('ngLockElementByQuerySelector', () => {
 
         @Component({ template: '<button (click)="onClick()" id="button" #button>{{value}}</button>', standalone: true, imports: [NgLockModule], })
         // eslint-disable-next-line @angular-eslint/component-class-suffix
         class TestComponent {
             @ViewChild('button') button!: ElementRef<HTMLElement>;
-
             value = 0;
-
             @ngLock({
                 lockElementFunction: ngLockElementByQuerySelector('button')
             })
             onClick() {
                 this.value++;
             }
-
             unlock() {
                 ngUnlock(this.onClick);
             }
@@ -55,22 +52,19 @@ describe('NgLock Component', () => {
 
 
 
-    it('test 2', () => {
+    it('ngLockElementByComponentProperty', () => {
 
         @Component({ template: '<button (click)="onClick()" #button>{{value}}</button>', standalone: true, imports: [NgLockModule] })
         // eslint-disable-next-line @angular-eslint/component-class-suffix
         class TestComponent {
             @ViewChild('button') button!: ElementRef<HTMLElement>;
-
             value = 0;
-
             @ngLock({
                 lockElementFunction: ngLockElementByComponentProperty('button')
             })
             onClick() {
                 this.value++;
             }
-
             unlock() {
                 ngUnlock(this.onClick);
             }
@@ -97,15 +91,13 @@ describe('NgLock Component', () => {
     });
 
 
-    it('test 3', () => {
+    it('ngLockElementByTargetEventArgument', () => {
 
         @Component({ template: '<button (click)="onClick()" #button>{{value}}</button>', standalone: true, imports: [NgLockModule] })
         // eslint-disable-next-line @angular-eslint/component-class-suffix
         class TestComponent {
             @ViewChild('button') button!: ElementRef<HTMLElement>;
-
             value = 0;
-
             @ngLock({
                 lockElementFunction: ngLockElementByTargetEventArgument()
             })
@@ -113,7 +105,6 @@ describe('NgLock Component', () => {
             onClick(e: any) {
                 this.value++;
             }
-
             unlock() {
                 ngUnlock(this.onClick);
             }
@@ -122,7 +113,6 @@ describe('NgLock Component', () => {
         fixture.detectChanges();
         const element = fixture.nativeElement as HTMLElement;
         const component = fixture.componentInstance;
-
 
         fixture.detectChanges();
         expect(element.textContent).toBe('0');
@@ -141,15 +131,13 @@ describe('NgLock Component', () => {
     });
 
 
-    it('test 4', async () => {
+    it('unlockTimeout', async () => {
 
         @Component({ template: '<button (click)="onClick()" #button>{{value}}</button>', standalone: true, imports: [NgLockModule] })
         // eslint-disable-next-line @angular-eslint/component-class-suffix
         class TestComponent {
             @ViewChild('button') button!: ElementRef<HTMLElement>;
-
             value = 0;
-
             @ngLock({
                 lockElementFunction: null as any,
                 lockClass: null as any,
@@ -204,7 +192,7 @@ describe('NgLock Decorator', () => {
 
         _ngLock(null as any, 'test', descriptor);
 
-        const el = document.createElement('DIV')
+        const el = document.createEvent('DIV')
 
         expect(descriptor.value(el)).toBe(1);
         expect(descriptor.value(el)).toBe(undefined as any);
@@ -254,7 +242,6 @@ describe('NgLock Decorator', () => {
         expect(descriptor.value(el)).toBe(2);
     });
 });
-
 
 
 describe('ngLockElementByTargetEventArgument', () => {
@@ -324,7 +311,7 @@ describe('ngLockElementByQuerySelector', () => {
         const fn = ngLockElementByQuerySelector();
         expect(function () { fn(null, null as any); }).toThrow(new Error("selector is required"));
     });
-    it('Element not foun', () => {
+    it('Element not found', () => {
         const fn = ngLockElementByQuerySelector('#xxxxxxxxxxxxxxxxxxxxxxx');
         expect(function () { fn(null, null as any); }).toThrow(new Error("Element not found"));
     });
