@@ -299,10 +299,10 @@ export function ngUnlock(fn: Function, reason?: string): void {
  * @return void
  */
 export function ngUnlockAll(self: any): void {
-    Object.getOwnPropertyNames(self).forEach(key => {
+    Object.getOwnPropertyNames(Object.getPrototypeOf(self)).forEach(key => {
         const prop = self[key];
-        if (typeof prop === 'function' && typeof prop[NG_UNLOCK_CALLBACK] === 'function') {
-            prop[NG_UNLOCK_CALLBACK]('ngUnlockAll');
+        if (typeof prop === 'function' && typeof prop['ngLock'] === 'object' && typeof prop['ngLock'][NG_UNLOCK_CALLBACK] === 'function') {
+            prop['ngLock'][NG_UNLOCK_CALLBACK]('ngUnlockAll');
         }
     });
 }

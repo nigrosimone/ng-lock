@@ -1,57 +1,44 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Component, DebugElement, ElementRef, ViewChild } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ngLock, ngUnlock, ngLockElementByQuerySelector, ngLockElementByComponentProperty, ngLockElementByTargetEventArgument, ngCallbacks, NG_UNLOCK_CALLBACK, NG_CALLBACKS, ngIsLock, ngUnlockAll } from './ng-lock.decorator';
+import { Component, ElementRef, ViewChild } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { ngLock, ngUnlock, ngLockElementByQuerySelector, ngLockElementByComponentProperty, ngLockElementByTargetEventArgument, ngCallbacks, NG_UNLOCK_CALLBACK, NG_CALLBACKS, ngIsLock, NG_LOCK_LOCKED_CLASS } from './ng-lock.decorator';
+import { NgLockModule } from './ng-lock.module';
 
 async function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-@Component({ template: '<button (click)="onClick()" id="button" #button>{{value}}</button>' })
-// eslint-disable-next-line @angular-eslint/component-class-suffix
-class TestComponent1 {
-    @ViewChild('button') button!: ElementRef<HTMLElement>;
+describe('NgLock Component', () => {
+    it('test 1', () => {
 
-    value = 0;
+        @Component({ template: '<button (click)="onClick()" id="button" #button>{{value}}</button>', standalone: true, imports: [NgLockModule], })
+        // eslint-disable-next-line @angular-eslint/component-class-suffix
+        class TestComponent {
+            @ViewChild('button') button!: ElementRef<HTMLElement>;
 
-    @ngLock({
-        lockElementFunction: ngLockElementByQuerySelector('button')
-    })
-    onClick() {
-        this.value++;
-    }
+            value = 0;
 
-    unlock() {
-        ngUnlock(this.onClick);
-    }
-}
-describe('NgLock: 1', () => {
+            @ngLock({
+                lockElementFunction: ngLockElementByQuerySelector('button')
+            })
+            onClick() {
+                this.value++;
+            }
 
-    let fixture: ComponentFixture<TestComponent1>;
-    let debugElement: DebugElement;
-    let element: HTMLElement;
-    let component: TestComponent1;
-
-    beforeEach(() => {
-        TestBed.configureTestingModule({
-            declarations: [TestComponent1],
-        });
-        fixture = TestBed.createComponent(TestComponent1);
-        debugElement = fixture.debugElement;
-        element = debugElement.nativeElement;
-        component = fixture.componentInstance;
-    });
-
-    afterEach(() => {
-        document.body.removeChild(element);
-    });
-
-    it('test', () => {
+            unlock() {
+                ngUnlock(this.onClick);
+            }
+        }
+        const fixture = TestBed.createComponent(TestComponent);
         fixture.detectChanges();
+        const element = fixture.nativeElement as HTMLElement;
+        const component = fixture.componentInstance;
+
         expect(element.textContent).toBe('0');
         expect(ngIsLock(component.onClick)).toBe(false);
         component.onClick();
         fixture.detectChanges();
+        expect(component.button.nativeElement.classList.contains(NG_LOCK_LOCKED_CLASS)).toBe(true);
         expect(element.textContent).toBe('1');
         component.onClick();
         fixture.detectChanges();
@@ -59,56 +46,40 @@ describe('NgLock: 1', () => {
         expect(ngIsLock(component.onClick)).toBe(true);
         component.unlock();
         fixture.detectChanges();
+        expect(component.button.nativeElement.classList.contains(NG_LOCK_LOCKED_CLASS)).toBe(false);
         expect(element.className).toBe('');
         component.onClick();
         fixture.detectChanges();
         expect(element.textContent).toBe('2');
     });
-});
 
 
 
+    it('test 2', () => {
 
-@Component({ template: '<button (click)="onClick()" #button>{{value}}</button>' })
-// eslint-disable-next-line @angular-eslint/component-class-suffix
-class TestComponent2 {
-    @ViewChild('button') button!: ElementRef<HTMLElement>;
+        @Component({ template: '<button (click)="onClick()" #button>{{value}}</button>', standalone: true, imports: [NgLockModule] })
+        // eslint-disable-next-line @angular-eslint/component-class-suffix
+        class TestComponent {
+            @ViewChild('button') button!: ElementRef<HTMLElement>;
 
-    value = 0;
+            value = 0;
 
-    @ngLock({
-        lockElementFunction: ngLockElementByComponentProperty('button')
-    })
-    onClick() {
-        this.value++;
-    }
+            @ngLock({
+                lockElementFunction: ngLockElementByComponentProperty('button')
+            })
+            onClick() {
+                this.value++;
+            }
 
-    unlock() {
-        ngUnlock(this.onClick);
-    }
-}
-describe('NgLock: 2', () => {
+            unlock() {
+                ngUnlock(this.onClick);
+            }
+        }
+        const fixture = TestBed.createComponent(TestComponent);
+        fixture.detectChanges();
+        const element = fixture.nativeElement as HTMLElement;
+        const component = fixture.componentInstance;
 
-    let fixture: ComponentFixture<TestComponent2>;
-    let debugElement: DebugElement;
-    let element: HTMLElement;
-    let component: TestComponent2;
-
-    beforeEach(() => {
-        TestBed.configureTestingModule({
-            declarations: [TestComponent2],
-        });
-        fixture = TestBed.createComponent(TestComponent2);
-        debugElement = fixture.debugElement;
-        element = debugElement.nativeElement;
-        component = fixture.componentInstance;
-    });
-
-    afterEach(() => {
-        document.body.removeChild(element);
-    });
-
-    it('test', () => {
         fixture.detectChanges();
         expect(element.textContent).toBe('0');
         component.onClick();
@@ -124,52 +95,35 @@ describe('NgLock: 2', () => {
         fixture.detectChanges();
         expect(element.textContent).toBe('2');
     });
-});
 
 
+    it('test 3', () => {
+
+        @Component({ template: '<button (click)="onClick()" #button>{{value}}</button>', standalone: true, imports: [NgLockModule] })
+        // eslint-disable-next-line @angular-eslint/component-class-suffix
+        class TestComponent {
+            @ViewChild('button') button!: ElementRef<HTMLElement>;
+
+            value = 0;
+
+            @ngLock({
+                lockElementFunction: ngLockElementByTargetEventArgument()
+            })
+            // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+            onClick(e: any) {
+                this.value++;
+            }
+
+            unlock() {
+                ngUnlock(this.onClick);
+            }
+        }
+        const fixture = TestBed.createComponent(TestComponent);
+        fixture.detectChanges();
+        const element = fixture.nativeElement as HTMLElement;
+        const component = fixture.componentInstance;
 
 
-@Component({ template: '<button (click)="onClick()" #button>{{value}}</button>' })
-// eslint-disable-next-line @angular-eslint/component-class-suffix
-class TestComponent3 {
-    @ViewChild('button') button!: ElementRef<HTMLElement>;
-
-    value = 0;
-
-    @ngLock({
-        lockElementFunction: ngLockElementByTargetEventArgument()
-    })
-    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-    onClick(e: any) {
-        this.value++;
-    }
-
-    unlock() {
-        ngUnlock(this.onClick);
-    }
-}
-describe('NgLock: 3', () => {
-
-    let fixture: ComponentFixture<TestComponent3>;
-    let debugElement: DebugElement;
-    let element: HTMLElement;
-    let component: TestComponent3;
-
-    beforeEach(() => {
-        TestBed.configureTestingModule({
-            declarations: [TestComponent3],
-        });
-        fixture = TestBed.createComponent(TestComponent3);
-        debugElement = fixture.debugElement;
-        element = debugElement.nativeElement;
-        component = fixture.componentInstance;
-    });
-
-    afterEach(() => {
-        document.body.removeChild(element);
-    });
-
-    it('test', () => {
         fixture.detectChanges();
         expect(element.textContent).toBe('0');
         component.onClick({ target: component.button.nativeElement });
@@ -185,52 +139,35 @@ describe('NgLock: 3', () => {
         fixture.detectChanges();
         expect(element.textContent).toBe('2');
     });
-});
 
 
+    it('test 4', async () => {
+
+        @Component({ template: '<button (click)="onClick()" #button>{{value}}</button>', standalone: true, imports: [NgLockModule] })
+        // eslint-disable-next-line @angular-eslint/component-class-suffix
+        class TestComponent {
+            @ViewChild('button') button!: ElementRef<HTMLElement>;
+
+            value = 0;
+
+            @ngLock({
+                lockElementFunction: null as any,
+                lockClass: null as any,
+                returnLastResultWhenLocked: true,
+                unlockTimeout: 1,
+                debug: true
+            })
+            // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+            onClick(e: any) {
+                this.value++;
+            }
+        }
+        const fixture = TestBed.createComponent(TestComponent);
+        fixture.detectChanges();
+        const element = fixture.nativeElement as HTMLElement;
+        const component = fixture.componentInstance;
 
 
-@Component({ template: '<button (click)="onClick()" #button>{{value}}</button>' })
-// eslint-disable-next-line @angular-eslint/component-class-suffix
-class TestComponent4 {
-    @ViewChild('button') button!: ElementRef<HTMLElement>;
-
-    value = 0;
-
-    @ngLock({
-        lockElementFunction: null as any,
-        lockClass: null as any,
-        returnLastResultWhenLocked: true,
-        unlockTimeout: 1,
-        debug: true
-    })
-    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-    onClick(e: any) {
-        this.value++;
-    }
-}
-describe('NgLock: 4', () => {
-
-    let fixture: ComponentFixture<TestComponent4>;
-    let debugElement: DebugElement;
-    let element: HTMLElement;
-    let component: TestComponent4;
-
-    beforeEach(() => {
-        TestBed.configureTestingModule({
-            declarations: [TestComponent4],
-        });
-        fixture = TestBed.createComponent(TestComponent4);
-        debugElement = fixture.debugElement;
-        element = debugElement.nativeElement;
-        component = fixture.componentInstance;
-    });
-
-    afterEach(() => {
-        document.body.removeChild(element);
-    });
-
-    it('test', async () => {
         fixture.detectChanges();
         expect(element.textContent).toBe('0');
         component.onClick({ target: component.button.nativeElement });
@@ -251,12 +188,8 @@ describe('NgLock: 4', () => {
 });
 
 
-
-
-
-
-describe('NgLock', () => {
-    it('test 1', () => {
+describe('NgLock Decorator', () => {
+    it('test default options', () => {
         const _ngLock = ngLock();
 
         let count = 0;
@@ -277,7 +210,7 @@ describe('NgLock', () => {
         expect(descriptor.value(el)).toBe(undefined as any);
     });
 
-    it('test 2', () => {
+    it('test maxCall', () => {
         const _ngLock = ngLock({ maxCall: 2 });
 
         let count = 0;
@@ -299,7 +232,7 @@ describe('NgLock', () => {
         expect(descriptor.value(el)).toBe(undefined as any);
     });
 
-    it('test 3', () => {
+    it('test maxCall with returnLastResultWhenLocked', () => {
         const _ngLock = ngLock({ maxCall: 2, returnLastResultWhenLocked: true });
 
         let count = 0;
@@ -445,25 +378,4 @@ describe('ngUnlockCallback', () => {
         const f = () => { };
         expect(function () { ngCallbacks(f, 'TEST' as NG_CALLBACKS); }).toThrow(new Error('"callback" param "TEST" must be a NG_CALLBACKS.'));
     });
-});
-
-describe('ngUnlockAll', () => {
-    it('ngUnlockAll', () => {
-
-        let test1 = false;
-        let test2 = false;
-        const self = {
-            test1: () => null,
-            test2: () => null,
-            test3: null
-        };
-        Object.defineProperty(self.test1, NG_UNLOCK_CALLBACK, { value: () => test1 = true, enumerable: true, writable: false });
-        Object.defineProperty(self.test2, NG_UNLOCK_CALLBACK, { value: () => test2 = true, enumerable: true, writable: false });
-
-        ngUnlockAll(self);
-
-        expect(test1).toBe(true);
-        expect(test2).toBe(true);
-    });
-    
 });

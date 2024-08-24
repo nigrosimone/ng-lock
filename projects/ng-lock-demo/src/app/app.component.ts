@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpClient } from '@angular/common/http';
 import { Component, Signal, ViewChild } from '@angular/core';
-import { ngLock, ngLockElementByComponentProperty, ngLockElementByQuerySelector, ngUnlock, withNgLockContext, ngLockChanges, ngLockSignal, ngLockObservable } from 'projects/ng-lock/src/public-api';
+import { ngLock, ngLockElementByComponentProperty, ngLockElementByQuerySelector, ngUnlock, withNgLockContext, ngLockChanges, ngLockSignal, ngLockObservable, ngUnlockAll } from 'projects/ng-lock/src/public-api';
 import { delay, Observable } from 'rxjs';
 
 const sleep = (time: number) => new Promise(resolve => setTimeout(resolve, time));
@@ -159,5 +159,15 @@ export class AppComponent {
     return this.http.get('https://my-json-server.typicode.com/typicode/demo/db')
       .pipe(delay(1000))
       .subscribe(response => console.log(this.subscriptionCompleted.name, response))
+  }
+  
+  @ngLock({ debug: true })
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onNoUnlock(e: MouseEvent){
+
+  }
+
+  onNgUnlockAll(){
+    ngUnlockAll(this)
   }
 }
