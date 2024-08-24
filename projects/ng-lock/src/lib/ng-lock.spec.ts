@@ -51,7 +51,6 @@ describe('NgLock Component', () => {
     });
 
 
-
     it('ngLockElementByComponentProperty', () => {
 
         @Component({ template: '<button (click)="onClick()" #button>{{value}}</button>', standalone: true, imports: [NgLockModule] })
@@ -173,6 +172,30 @@ describe('NgLock Component', () => {
         fixture.detectChanges();
         expect(element.textContent).toBe('2');
     });
+
+    it('Promise', async () => {
+
+        @Component({ template: '<button (click)="onClick()" #button>test</button>', standalone: true, imports: [NgLockModule] })
+        // eslint-disable-next-line @angular-eslint/component-class-suffix
+        class TestComponent {
+            @ViewChild('button') button!: ElementRef<HTMLElement>;
+            @ngLock()
+            // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+            async onClick(e: any) {
+                await sleep(1);
+                return true;
+            }
+        }
+        const fixture = TestBed.createComponent(TestComponent);
+        fixture.detectChanges();
+        const component = fixture.componentInstance;
+
+        component.onClick({ target: component.button.nativeElement });
+        fixture.detectChanges();
+        expect(component.button.nativeElement.classList.contains(NG_LOCK_LOCKED_CLASS)).toBe(true);
+        await sleep(5);
+        expect(component.button.nativeElement.classList.contains(NG_LOCK_LOCKED_CLASS)).toBe(false);
+    });
 });
 
 
@@ -192,7 +215,7 @@ describe('NgLock Decorator', () => {
 
         _ngLock(null as any, 'test', descriptor);
 
-        const el = document.createEvent('DIV')
+        const el = document.createElement('DIV')
 
         expect(descriptor.value(el)).toBe(1);
         expect(descriptor.value(el)).toBe(undefined as any);
