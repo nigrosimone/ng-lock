@@ -62,6 +62,7 @@ export class AppComponent {
 
   @ngLock({
     unlockTimeout: 3000,
+    maxCall: 3,
     lockElementFunction: ngLockElementByQuerySelector(".button5"),
     debug: true
   })

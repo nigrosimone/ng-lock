@@ -225,16 +225,16 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
                 }
                 ngLockSignal.set(true);
                 ngLockSubject.next(true);
+                if (_options.unlockTimeout) {
+                    timeoutHandle = setTimeout(() => {
+                        ngUnlockCallback('unlockTimeout reached');
+                    }, _options.unlockTimeout) as any;
+                }
             }
 
             lastResult = originalMethod.apply(this, args);
             ngLockLog(`NgLock: execute method "${key}"`);
 
-            if (_options.unlockTimeout) {
-                timeoutHandle = setTimeout(() => {
-                    ngUnlockCallback('unlockTimeout reached');
-                }, _options.unlockTimeout) as any;
-            }
 
             if (_options.unlockOnPromiseResolve && lastResult && typeof lastResult.finally === 'function' && typeof lastResult.then === 'function' && lastResult[Symbol.toStringTag] === 'Promise') {
                 (lastResult as Promise<any>).finally(() => {
