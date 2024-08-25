@@ -9,7 +9,7 @@ import { ngUnlock } from "./ng-lock.decorator";
 export function ngLockChanges(methodToUnlock: Function) {
     return function <T>(source: Observable<T>): Observable<T> {
         return new Observable((subscriber) => {
-            source.subscribe({
+            const subscription = source.subscribe({
                 next(value) {
                     subscriber.next(value);
                     ngUnlock(methodToUnlock, 'Observable changes')
@@ -23,6 +23,8 @@ export function ngLockChanges(methodToUnlock: Function) {
                     ngUnlock(methodToUnlock, 'Observable complete')
                 }
             })
+            return () => subscription.unsubscribe();
         });
+
     }
 }
