@@ -48,9 +48,18 @@ export class AppModule { }
 ```ts
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ngLock, ngUnlock, withNgLockContext, ngLockChanges, ngLockSignal, ngLockObservable } from 'ng-lock';
+import {
+  ngLock,
+  ngUnlock,
+  withNgLockContext,
+  ngLockChanges,
+  NgLockModule,
+  ngLockSignal,
+  ngLockObservable,
+} from 'ng-lock';
 
 const sleep = (time: number) => new Promise(resolve => setTimeout(resolve, time));
+const WAIT_TIME = 1500;
 
 @Component({
   selector: 'app-root',
