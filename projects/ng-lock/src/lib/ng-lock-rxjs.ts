@@ -25,6 +25,5 @@ export function ngLockChanges(methodToUnlock: Function) {
             })
             return () => subscription.unsubscribe();
         });
-
     }
 }

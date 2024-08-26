@@ -61,18 +61,20 @@ const sleep = (time: number) => new Promise(resolve => setTimeout(resolve, time)
     <button (click)="onClick($event)">Click me</button>
     <hr />
     Disable the button on click and enable when <b>HTTP</b> request is completed<br>
-    <button (click)="onHttpRequestContext($event)">Click me</button>
+    <button (click)="onHttpRequest($event)">Click me</button>
     <hr />
     Disable the button on click and enable when <b>Observable</b> changes<br>
-    <button (click)="onHttpRequestObservable($event)">Click me</button>
+    <button (click)="onObservable($event)">Click me</button>
     <hr />
     Disable the button on click and enable when <b>Promise</b> is resolved<br>
     <button (click)="onAsync($event)">Click me</button><br>
-    Signal: {{ sigAsyncMethod() }}, Observable: {{ asyncMethod$ | async }}
+    <em>Signal: {{ sigAsyncMethod() }}, Observable: {{ asyncMethod$ | async }}</em>
     <hr />
     Disable the button on click and enable when <b>Subscription</b> changes<br>
-    <button (click)="onSubscriptionChanges($event)">Click me</button>
+    <button (click)="onSubscription($event)">Click me</button>
     <hr />
+    Disable the button on click and enable when <b>unlockTimeout</b> expire<br>
+    <button (click)="onTimeout($event)">Click me</button>
   `,
   styles: [`
     button.ng-lock-locked {
@@ -102,35 +104,29 @@ export class AppComponent {
     setTimeout(() => {
       ngUnlock(this.onClick);
       console.log('onClick', 'done');
-    }, 1000);
+    }, WAIT_TIME);
   }
 
   /**
    * @ngLock() apply "ng-lock-locked" class on first call and remove it on HTTP response (@see withNgLockContext)
    */
   @ngLock({ debug: isDevMode() })
-  onHttpRequestContext(e: MouseEvent) {
+  onHttpRequest(e: MouseEvent) {
     this.http
       .get('https://my-json-server.typicode.com/typicode/demo/db', {
-        context: withNgLockContext(this.onHttpRequestContext),
+        context: withNgLockContext(this.onHttpRequest),
       })
-      .pipe(delay(1000))
-      .subscribe((response) => {
-        console.log('onHttpRequestContext', response);
-      });
+      .subscribe((response) => console.log('onHttpRequest', response));
   }
 
   /**
    * @ngLock() apply "ng-lock-locked" class on first call and remove it on observable changes (@see ngLockChanges)
    */
   @ngLock({ debug: isDevMode() })
-  onHttpRequestObservable(e: MouseEvent) {
-    this.http
-      .get('https://my-json-server.typicode.com/typicode/demo/db')
-      .pipe(delay(1000), ngLockChanges(this.onHttpRequestObservable))
-      .subscribe((response) => {
-        console.log('onHttpRequestObservable', response);
-      });
+  onObservable(e: MouseEvent) {
+    of('done')
+      .pipe(delay(WAIT_TIME), ngLockChanges(this.onObservable))
+      .subscribe((response) => console.log('onObservable', response));
   }
 
   /**
@@ -138,8 +134,8 @@ export class AppComponent {
    */
   @ngLock({ debug: isDevMode() })
   async onAsync(e: MouseEvent) {
-    // async method or that return a Promise is handled automatic unlock when resolve
-    await sleep(1000);
+    // async method or that return a Promise is handled, automatic unlock when resolve
+    await sleep(WAIT_TIME);
     console.log('onAsync', 'done');
   }
 
@@ -147,12 +143,19 @@ export class AppComponent {
    * @ngLock() apply "ng-lock-locked" class on first call and remove on subscription changes
    */
   @ngLock({ debug: isDevMode() })
-  onSubscriptionChanges(e: MouseEvent) {
-    // method that return a Subscription is handled automatic unlock when changes
-    return this.http
-      .get('https://my-json-server.typicode.com/typicode/demo/db')
-      .pipe(delay(1000))
-      .subscribe((response) => console.log('onSubscriptionChanges', response));
+  onSubscription(e: MouseEvent) {
+    // method that return a Subscription is handled, automatic unlock when changes
+    return of('done')
+      .pipe(delay(WAIT_TIME))
+      .subscribe((response) => console.log('onSubscription', response));
+  }
+
+  /**
+   * @ngLock() apply "ng-lock-locked" class on first call and remove it after unlockTimeout milliseconds
+   */
+  @ngLock({ debug: isDevMode(), unlockTimeout: WAIT_TIME })
+  onTimeout(e: MouseEvent) {
+    console.log('onTimeout', 'done');
   }
 }
 ```
