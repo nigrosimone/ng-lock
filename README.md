@@ -46,8 +46,9 @@ export class AppModule { }
 *Step 3*: Decorate a function with `@ngLock()` decorator, eg.:
 
 ```ts
-import { Component } from '@angular/core';
+import { Component, isDevMode, Signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { delay, Observable, of } from 'rxjs';
 import {
   ngLock,
   ngUnlock,
