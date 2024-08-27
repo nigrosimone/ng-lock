@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { ngLock, ngUnlock, ngLockElementByQuerySelector, ngLockElementByComponentProperty, ngLockElementByTargetEventArgument, ngCallbacks, NG_UNLOCK_CALLBACK, NG_CALLBACKS, ngIsLock, NG_LOCK_LOCKED_CLASS } from './ng-lock.decorator';
+import { ngLock, ngUnlock, ngLockElementByQuerySelector, ngLockElementByComponentProperty, ngLockElementByTargetEventArgument, ngCallbacks, ngIsLock } from './ng-lock.decorator';
 import { NgLockModule } from './ng-lock.module';
+import { NG_CALLBACKS, NG_LOCK_LOCKED_CLASS, NG_UNLOCK_CALLBACK } from './ng-lock-types';
 
 async function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
