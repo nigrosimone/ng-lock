@@ -1,6 +1,6 @@
 import { Signal, signal } from "@angular/core";
 import { BehaviorSubject, Observable, Subscriber } from "rxjs";
-import { NG_CALLBACKS, NG_IS_LOCK_CALLBACK, NG_LOCK_LOCKED_CLASS, NG_LOCK_SIGNAL, NG_LOCK_SUBJECT, NG_UNLOCK_CALLBACK, NgLockAllOption, NgLockElementFinder, NgLockElementFunction, NgLockFunction, NgLockOption } from "./ng-lock-types";
+import { NG_CALLBACKS, NG_IS_LOCK_CALLBACK, NG_LOCK_LOCKED_CLASS, NG_LOCK_OPTION, NG_LOCK_SIGNAL, NG_LOCK_SUBJECT, NG_UNLOCK_CALLBACK, NgLockAllOption, NgLockElementFinder, NgLockElementFunction, NgLockFunction, NgLockOption } from "./ng-lock-types";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -240,6 +240,7 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
 
         Object.defineProperty(descriptor.value, 'ngLock', {
             value: {
+                [NG_LOCK_OPTION]: () => _options,
                 [NG_UNLOCK_CALLBACK]: ngUnlockCallback,
                 [NG_IS_LOCK_CALLBACK]: ngIsLockCallback,
                 [NG_LOCK_SIGNAL]: () => ngLockSignal.asReadonly(),
@@ -299,6 +300,16 @@ export function ngLockSignal(method: NgLockFunction): Signal<boolean> {
 }
 
 /**
+ * Return the option for the given function
+ * @param {NgLockFunction} method The function
+ * @return {NgLockAllOption}
+ */
+export function ngLockOption(method: NgLockFunction): NgLockAllOption {
+    const callback = ngCallbacks(method, NG_LOCK_OPTION);
+    return callback();
+}
+
+/**
  * Return an Observable for the given function on the lock status (locked/unlocked)
  * @param {NgLockFunction} method The function
  * @return {Observable<boolean>}
@@ -319,7 +330,7 @@ export function ngCallbacks(method: NgLockFunction, callback: NG_CALLBACKS): NgL
     if (!(method instanceof Function)) {
         throw new Error('"method" param must be a function.');
     }
-    if (callback !== NG_UNLOCK_CALLBACK && callback !== NG_IS_LOCK_CALLBACK && callback !== NG_LOCK_SIGNAL && callback !== NG_LOCK_SUBJECT) {
+    if (callback !== NG_UNLOCK_CALLBACK && callback !== NG_IS_LOCK_CALLBACK && callback !== NG_LOCK_SIGNAL && callback !== NG_LOCK_SUBJECT &&  callback !== NG_LOCK_OPTION) {
         throw new Error(`"callback" param "${callback}" must be a NG_CALLBACKS.`);
     }
     if (typeof (method as any)['ngLock'] !== 'object') {

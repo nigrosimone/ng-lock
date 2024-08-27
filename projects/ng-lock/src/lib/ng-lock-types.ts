@@ -8,14 +8,15 @@ export const NG_UNLOCK_CALLBACK = 'ngUnlockCallback';
 export const NG_IS_LOCK_CALLBACK = 'ngIsLockCallback';
 export const NG_LOCK_SIGNAL = 'ngLockSignal';
 export const NG_LOCK_SUBJECT = 'ngLockSubject';
-export type NG_CALLBACKS = typeof NG_UNLOCK_CALLBACK | typeof NG_IS_LOCK_CALLBACK | typeof NG_LOCK_SIGNAL | typeof NG_LOCK_SUBJECT;
+export const NG_LOCK_OPTION = 'ngLockOption';
+export type NG_CALLBACKS = typeof NG_UNLOCK_CALLBACK | typeof NG_IS_LOCK_CALLBACK | typeof NG_LOCK_SIGNAL | typeof NG_LOCK_SUBJECT | typeof NG_LOCK_OPTION;
 export const NG_LOCK_LOCKED_CLASS = 'ng-lock-locked';
 
 export interface NgLockAllOption {
     maxCall: number,
     unlockTimeout: number | null;
     lockElementFunction: NgLockElementFinder;
-    lockClass?: string;
+    lockClass: string;
     returnLastResultWhenLocked: boolean;
     unlockOnPromiseResolve: boolean;
     unlockOnObservableChanges: boolean;
