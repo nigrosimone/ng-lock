@@ -1,15 +1,5 @@
 .ng-lock-locked {
   pointer-events: none;
-  cursor: wait;
+  user-select: none;
   font-style: italic;
-}
-  
-button.ng-lock-locked {
-  border: 1px solid #999999;
-  background-color: #cccccc;
-  color: #666666;
-}
-  
-a.ng-lock-locked {
-  color: #666666;
 }

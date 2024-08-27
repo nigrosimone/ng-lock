@@ -1,5 +1,5 @@
 import { HttpContext, HttpContextToken } from "@angular/common/http";
-import { NgLockFunction } from "./ng-lock-types";
+import type { NgLockFunction } from "./ng-lock-types";
 
 /**
  * Unlock the given method on HTTP response
