@@ -116,6 +116,28 @@ export const NgLockDefaultOption: NgLockAllOption = {
 } as const;
 
 /**
+ * Add class and attribute on HTML element
+ * @param {Element} elementToLock 
+ * @param {NgLockOption} options 
+ */
+export const ngLockHtmlElement = (elementToLock: Element, options: NgLockOption) => {
+    if (options.lockClass) elementToLock.classList.add(options.lockClass);
+    elementToLock.setAttribute('disabled', 'disabled');
+    elementToLock.setAttribute('aria-disabled', 'true');
+}
+
+/**
+ * Remove class and attribute from HTML element
+ * @param {Element} elementToLock 
+ * @param {NgLockOption} options 
+ */
+export const ngUnLockHtmlElement = (elementToLock: Element, options: NgLockOption) => {
+    if (options.lockClass) elementToLock.classList.remove(options.lockClass);
+    elementToLock.removeAttribute('disabled');
+    elementToLock.removeAttribute('aria-disabled');
+}
+
+/**
  * Lock the decorated function
  * @param {NgLockOption} options (optional) NgLockOption
  * @return {MethodDecorator} Return a MethodDecorator
@@ -154,9 +176,7 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
             ngLockLog(message);
             callCounter = 0;
             if (_options.lockClass && elementToLock) {
-                elementToLock.classList.remove(_options.lockClass);
-                elementToLock.removeAttribute('disabled');
-                elementToLock.removeAttribute('aria-disabled');
+                ngUnLockHtmlElement(elementToLock, _options);
             }
             if (_options.unlockTimeout && timeoutHandle) {
                 clearTimeout(timeoutHandle);
@@ -189,9 +209,7 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
             }
             if (ngIsLockCallback()) {
                 if (_options.lockClass && elementToLock) {
-                    elementToLock.classList.add(_options.lockClass);
-                    elementToLock.setAttribute('disabled', 'disabled');
-                    elementToLock.setAttribute('aria-disabled', 'true');
+                    ngLockHtmlElement(elementToLock, _options)
                 }
                 ngLockSignal.set(true);
                 ngLockSubject.next(true);
@@ -330,7 +348,7 @@ export function ngCallbacks(method: NgLockFunction, callback: NG_CALLBACKS): NgL
     if (!(method instanceof Function)) {
         throw new Error('"method" param must be a function.');
     }
-    if (callback !== NG_UNLOCK_CALLBACK && callback !== NG_IS_LOCK_CALLBACK && callback !== NG_LOCK_SIGNAL && callback !== NG_LOCK_SUBJECT &&  callback !== NG_LOCK_OPTION) {
+    if (callback !== NG_UNLOCK_CALLBACK && callback !== NG_IS_LOCK_CALLBACK && callback !== NG_LOCK_SIGNAL && callback !== NG_LOCK_SUBJECT && callback !== NG_LOCK_OPTION) {
         throw new Error(`"callback" param "${callback}" must be a NG_CALLBACKS.`);
     }
     if (typeof (method as any)['ngLock'] !== 'object') {
