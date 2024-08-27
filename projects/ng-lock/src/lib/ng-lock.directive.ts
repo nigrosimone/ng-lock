@@ -1,7 +1,7 @@
 import { DestroyRef, Directive, ElementRef, Input, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NgLockFunction } from './ng-lock-types';
-import { ngLockObservable, ngLockOption } from './ng-lock.decorator';
+import { ngLockHtmlElement, ngLockObservable, ngLockOption, ngUnLockHtmlElement } from './ng-lock.decorator';
 
 @Directive({
     selector: '[ngLock]'
@@ -19,13 +19,9 @@ export class NgLockDirective implements OnInit {
         const option = ngLockOption(this.ngLock)
         ngLockObservable(this.ngLock).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(status => {
             if (status) {
-                this.eleRef.nativeElement.classList.add(option.lockClass);
-                this.eleRef.nativeElement.setAttribute('disabled', 'disabled');
-                this.eleRef.nativeElement.setAttribute('aria-disabled', 'true');
+                ngLockHtmlElement(this.eleRef.nativeElement, option)
             } else {
-                this.eleRef.nativeElement.classList.remove(option.lockClass);
-                this.eleRef.nativeElement.removeAttribute('disabled')
-                this.eleRef.nativeElement.removeAttribute('aria-disabled');
+                ngUnLockHtmlElement(this.eleRef.nativeElement, option)
             }
         })
     }
