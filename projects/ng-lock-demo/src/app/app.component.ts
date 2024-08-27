@@ -20,8 +20,7 @@ export class AppComponent {
   constructor(private http: HttpClient) { }
 
   @ngLock({ debug: true })
-  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-  async test1(e: MouseEvent) {
+  async test1(_: MouseEvent) {
     try {
       await sleep(1000);
       console.log("test1");
@@ -31,8 +30,7 @@ export class AppComponent {
   }
 
   @ngLock({ unlockTimeout: 3000, debug: true })
-  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-  test2(e: any) {
+  test2(_: MouseEvent) {
     setTimeout(() => {
       console.log("test2");
     }, 1000);
@@ -119,8 +117,7 @@ export class AppComponent {
   }
 
   @ngLock({ debug: true })
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  httpContext(e: MouseEvent) {
+  httpContext(_: MouseEvent) {
     this.http.get('https://my-json-server.typicode.com/typicode/demo/db', {
       context: withNgLockContext(this.httpContext)
     })
@@ -129,23 +126,20 @@ export class AppComponent {
   }
 
   @ngLock({ debug: true })
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  observableChanges(e: MouseEvent) {
+  observableChanges(_: MouseEvent) {
     this.http.get('https://my-json-server.typicode.com/typicode/demo/db')
       .pipe(delay(1000), ngLockChanges(this.observableChanges))
       .subscribe(response => console.log(this.observableChanges.name, response))
   }
 
   @ngLock({ debug: true })
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async asyncMethod(e: MouseEvent) {
+  async asyncMethod(_: MouseEvent) {
     await sleep(1000);
     console.log(this.asyncMethod.name, 'done')
   }
 
   @ngLock({ debug: true })
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  promiseMethod(e: MouseEvent) {
+  promiseMethod(_: MouseEvent) {
     return new Promise(resolve => {
       setTimeout(() => {
         console.log(this.promiseMethod.name, 'done')
@@ -155,16 +149,14 @@ export class AppComponent {
   }
 
   @ngLock({ debug: true })
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  subscriptionCompleted(e: MouseEvent) {
+  subscriptionCompleted(_: MouseEvent) {
     return this.http.get('https://my-json-server.typicode.com/typicode/demo/db')
       .pipe(delay(1000))
       .subscribe(response => console.log(this.subscriptionCompleted.name, response))
   }
   
   @ngLock({ debug: true })
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onNoUnlock(e: MouseEvent){
+  onNoUnlock(_: MouseEvent){
 
   }
 

@@ -1,5 +1,6 @@
 import { Signal, signal } from "@angular/core";
-import { BehaviorSubject, Observable, of, Subscriber } from "rxjs";
+import { BehaviorSubject, Observable, Subscriber } from "rxjs";
+import { NgLockElementFinder, NgLockElementFunction, NgLockFunction } from "./ng-lock-types";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const NG_UNLOCK_CALLBACK = 'ngUnlockCallback';
@@ -9,19 +10,14 @@ export const NG_LOCK_SUBJECT = 'ngLockSubject';
 export type NG_CALLBACKS = typeof NG_UNLOCK_CALLBACK | typeof NG_IS_LOCK_CALLBACK | typeof NG_LOCK_SIGNAL | typeof NG_LOCK_SUBJECT;
 export const NG_LOCK_LOCKED_CLASS = 'ng-lock-locked';
 
-// eslint-disable-next-line no-unused-vars
-export type NgLockElementFunction = (...args: any[]) => NgLockElementFinder;
-// eslint-disable-next-line no-unused-vars
-export type NgLockElementFinder = (self: any, args: any[]) => Element;
-
 /**
  * Uses the provided "selector" to find with "querySelector()" and apply the lockClass on the founded element.
- * @param selector A DOMString containing a selector to match.
- * @returns Return a NgLockElementFinder function
+ * @param {string} selector A DOMString containing a selector to match.
+ * @returns {NgLockElementFinder} Return a NgLockElementFinder function
+ * @throws Error
  */
 export const ngLockElementByQuerySelector: NgLockElementFunction = (selector: string): NgLockElementFinder => {
-    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-    return (self: any, args: any[]): Element => {
+    return (_self: any, _args: any[]): Element => {
         if (!selector) {
             throw new Error('selector is required');
         }
@@ -37,11 +33,12 @@ export const ngLockElementByQuerySelector: NgLockElementFunction = (selector: st
 /**
  * Uses a function argument for apply the lockClass. If provided a argsIndex use the specific argument, otherwise
  * search an argument with a target property that is a HTMLElement
- * @param argsIndex (optional) index of the argument that is HTMLElement or contains target property (also a HTMLElement)
- * @returns Return a NgLockElementFinder function
+ * @param {number} argsIndex (optional) index of the argument that is HTMLElement or contains target property (also a HTMLElement)
+ * @returns {NgLockElementFinder} Return a NgLockElementFinder function
+ * @throws Error
  */
 export const ngLockElementByTargetEventArgument: NgLockElementFunction = (argsIndex?: number): NgLockElementFinder => {
-    return (self: any, args: any[]): Element => {
+    return (_self: any, args: any[]): Element => {
         if (!args || args.length <= 0) {
             throw new Error('Method without arguments');
         }
@@ -85,12 +82,12 @@ export const ngLockElementByTargetEventArgument: NgLockElementFunction = (argsIn
 
 /**
  * Apply lockClass to a component property that must be a HTMLElement or element with Angular nativeElement (also a HTMLElement)
- * @param property The property name of the component
- * @returns Return a NgLockElementFinder function
+ * @param {string} property The property name of the component
+ * @returns {NgLockElementFinder} Return a NgLockElementFinder function
+ * @throws Error
  */
 export const ngLockElementByComponentProperty: NgLockElementFunction = (property: string): NgLockElementFinder => {
-    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-    return (self: any, args: any[]): Element => {
+    return (self: any, _args: any[]): Element => {
         if (!property) {
             throw new Error('Property is required');
         }
@@ -145,16 +142,15 @@ export const NgLockDefaultOption: NgLockOption = {
     unlockOnPromiseResolve: true,
     unlockOnObservableChanges: true,
     debug: false
-};
+} as const;
 
 /**
  * Lock the decorated function
- * @param options (optional) NgLockOption
- * @return Return a MethodDecorator
+ * @param {NgLockOption} options (optional) NgLockOption
+ * @return {MethodDecorator} Return a MethodDecorator
  */
 export function ngLock(options?: NgLockOption): MethodDecorator {
-
-    return function (target: any, key: any, descriptor: any): void {
+    return function (_target: any, key: any, descriptor: any): void {
 
         let _options: NgLockOption;
         if (!options) {
@@ -163,7 +159,6 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
             _options = { ...NgLockDefaultOption, ...options };
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-inferrable-types
         let callCounter: number = 0;
         let timeoutHandle: number | null = null;
         let elementToLock: Element | null = null;
@@ -282,25 +277,25 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
 }
 
 /**
- * Unlock a locked function by @ngLock() decorator
- * @param fn The function to unlock
- * @return void
+ * Unlock a locked function by ngLock() decorator
+ * @param {NgLockFunction} methodToUnlock The function to unlock
+ * @param {string} reason The reason for the log
+ * @return {void}
  * @throws Error
  */
-// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-export function ngUnlock(fn: Function, reason?: string): void {
-    const callback = ngCallbacks(fn, NG_UNLOCK_CALLBACK);
+export function ngUnlock(methodToUnlock: NgLockFunction, reason?: string): void {
+    const callback = ngCallbacks(methodToUnlock, NG_UNLOCK_CALLBACK);
     callback(reason);
 }
 
 /**
- * Unlock all locked functions by @ngLock() decorator
- * @param self The component instance (this)
- * @return void
+ * Unlock all locked functions by ngLock() decorator
+ * @param {any} component The component instance (this)
+ * @return {void}
  */
-export function ngUnlockAll(self: any): void {
-    Object.getOwnPropertyNames(Object.getPrototypeOf(self)).forEach(key => {
-        const prop = self[key];
+export function ngUnlockAll(component: any): void {
+    Object.getOwnPropertyNames(Object.getPrototypeOf(component)).forEach(key => {
+        const prop = component[key];
         if (typeof prop === 'function' && typeof prop['ngLock'] === 'object' && typeof prop['ngLock'][NG_UNLOCK_CALLBACK] === 'function') {
             prop['ngLock'][NG_UNLOCK_CALLBACK]('ngUnlockAll');
         }
@@ -309,68 +304,54 @@ export function ngUnlockAll(self: any): void {
 
 /**
  * Return true if the provided function is locked
- * @param fn The function to unlock
- * @return boolean
+ * @param {NgLockFunction} methodToCheck The method to check
+ * @return {boolean}
  * @throws Error
  */
-// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-export function ngIsLock(fn: Function): boolean {
-    const callback = ngCallbacks(fn, NG_IS_LOCK_CALLBACK);
+export function ngIsLock(methodToCheck: NgLockFunction): boolean {
+    const callback = ngCallbacks(methodToCheck, NG_IS_LOCK_CALLBACK);
     return callback();
 }
 
 /**
  * Return a Signal for the given function on the lock status (locked/unlocked)
- * @param fn The function
- * @return Signal<boolean>
+ * @param {NgLockFunction} method The function
+ * @return {Signal<boolean>}
  */
-// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-export function ngLockSignal(fn: Function): Signal<boolean> {
-    try {
-        const callback = ngCallbacks(fn, NG_LOCK_SIGNAL);
-        return callback();
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-        return signal(false).asReadonly()
-    }
+export function ngLockSignal(method: NgLockFunction): Signal<boolean> {
+    const callback = ngCallbacks(method, NG_LOCK_SIGNAL);
+    return callback();
 }
 
 /**
  * Return an Observable for the given function on the lock status (locked/unlocked)
- * @param fn The function
- * @return Observable<boolean>
+ * @param {NgLockFunction} method The function
+ * @return {Observable<boolean>}
  */
-// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-export function ngLockObservable(fn: Function): Observable<boolean> {
-    try {
-        const callback = ngCallbacks(fn, NG_LOCK_SUBJECT);
-        return callback();
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-        return of(false)
-    }
+export function ngLockObservable(method: NgLockFunction): Observable<boolean> {
+    const callback = ngCallbacks(method, NG_LOCK_SUBJECT);
+    return callback();
 }
 
 /**
  * Return the provided NG_CALLBACKS
- * @param fn The function to return the unlock callback
- * @param callback The NG_CALLBACKS
- * @return Return the NG_CALLBACKS
+ * @param {NgLockFunction} method The function to return the unlock callback
+ * @param {NG_CALLBACKS} callback The NG_CALLBACKS
+ * @return {NgLockFunction} Return the NG_CALLBACKS
  * @throws Error
  */
-// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-export function ngCallbacks(fn: Function, callback: NG_CALLBACKS): Function {
-    if (!(fn instanceof Function)) {
-        throw new Error('"fn" param must be a function.');
+export function ngCallbacks(method: NgLockFunction, callback: NG_CALLBACKS): NgLockFunction {
+    if (!(method instanceof Function)) {
+        throw new Error('"method" param must be a function.');
     }
     if (callback !== NG_UNLOCK_CALLBACK && callback !== NG_IS_LOCK_CALLBACK && callback !== NG_LOCK_SIGNAL && callback !== NG_LOCK_SUBJECT) {
         throw new Error(`"callback" param "${callback}" must be a NG_CALLBACKS.`);
     }
-    if (typeof (fn as any)['ngLock'] !== 'object') {
-        throw new Error(`"fn" param (function ${fn.name}) must be a @ngLock() decorated function.`);
+    if (typeof (method as any)['ngLock'] !== 'object') {
+        throw new Error(`"method" param (function ${method.name}) must be a @ngLock() decorated function.`);
     }
-    if (typeof (fn as any)['ngLock'][callback as any] !== 'function') {
-        throw new Error(`"fn" param (function ${fn.name}) must be a @ngLock() decorated function with "${callback}".`);
+    if (typeof (method as any)['ngLock'][callback as any] !== 'function') {
+        throw new Error(`"method" param (function ${method.name}) must be a @ngLock() decorated function with "${callback}".`);
     }
-    return (fn as any)['ngLock'][callback];
+    return (method as any)['ngLock'][callback];
 }

@@ -12,7 +12,6 @@ describe('NgLock Component', () => {
     it('ngLockElementByQuerySelector', () => {
 
         @Component({ template: '<button (click)="onClick()" id="button" #button>{{value}}</button>', standalone: true, imports: [NgLockModule], })
-        // eslint-disable-next-line @angular-eslint/component-class-suffix
         class TestComponent {
             @ViewChild('button') button!: ElementRef<HTMLElement>;
             value = 0;
@@ -54,7 +53,6 @@ describe('NgLock Component', () => {
     it('ngLockElementByComponentProperty', () => {
 
         @Component({ template: '<button (click)="onClick()" #button>{{value}}</button>', standalone: true, imports: [NgLockModule] })
-        // eslint-disable-next-line @angular-eslint/component-class-suffix
         class TestComponent {
             @ViewChild('button') button!: ElementRef<HTMLElement>;
             value = 0;
@@ -93,15 +91,13 @@ describe('NgLock Component', () => {
     it('ngLockElementByTargetEventArgument', () => {
 
         @Component({ template: '<button (click)="onClick()" #button>{{value}}</button>', standalone: true, imports: [NgLockModule] })
-        // eslint-disable-next-line @angular-eslint/component-class-suffix
         class TestComponent {
             @ViewChild('button') button!: ElementRef<HTMLElement>;
             value = 0;
             @ngLock({
                 lockElementFunction: ngLockElementByTargetEventArgument()
             })
-            // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-            onClick(e: any) {
+            onClick(_: any) {
                 this.value++;
             }
             unlock() {
@@ -133,7 +129,6 @@ describe('NgLock Component', () => {
     it('unlockTimeout', async () => {
 
         @Component({ template: '<button (click)="onClick()" #button>{{value}}</button>', standalone: true, imports: [NgLockModule] })
-        // eslint-disable-next-line @angular-eslint/component-class-suffix
         class TestComponent {
             @ViewChild('button') button!: ElementRef<HTMLElement>;
             value = 0;
@@ -144,8 +139,7 @@ describe('NgLock Component', () => {
                 unlockTimeout: 1,
                 debug: true
             })
-            // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-            onClick(e: any) {
+            onClick(_: any) {
                 this.value++;
             }
         }
@@ -176,12 +170,10 @@ describe('NgLock Component', () => {
     it('Promise', async () => {
 
         @Component({ template: '<button (click)="onClick()" #button>test</button>', standalone: true, imports: [NgLockModule] })
-        // eslint-disable-next-line @angular-eslint/component-class-suffix
         class TestComponent {
             @ViewChild('button') button!: ElementRef<HTMLElement>;
             @ngLock()
-            // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-            async onClick(e: any) {
+            async onClick(_: any) {
                 await sleep(1);
                 return true;
             }
@@ -206,8 +198,7 @@ describe('NgLock Decorator', () => {
         let count = 0;
 
         const descriptor = {
-            // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-            value: (x: any) => {
+            value: (_: any) => {
                 count++;
                 return count;
             }
@@ -227,8 +218,7 @@ describe('NgLock Decorator', () => {
         let count = 0;
 
         const descriptor = {
-            // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-            value: (x: any) => {
+            value: (_: any) => {
                 count++;
                 return count;
             }
@@ -249,8 +239,7 @@ describe('NgLock Decorator', () => {
         let count = 0;
 
         const descriptor = {
-            // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-            value: (x: any) => {
+            value: (_: any) => {
                 count++;
                 return count;
             }
@@ -375,16 +364,14 @@ describe('ngLockElementByComponentProperty', () => {
 
 
 describe('ngUnlockCallback', () => {
-    it('"fn" param must be a function', () => {
-        expect(function () { ngCallbacks(null as any, NG_UNLOCK_CALLBACK); }).toThrow(new Error('"fn" param must be a function.'));
+    it('"method" param must be a function', () => {
+        expect(function () { ngCallbacks(null as any, NG_UNLOCK_CALLBACK); }).toThrow(new Error('"method" param must be a function.'));
     });
-    it('"fn" param (function f) must be a @ngLock() decorated function.', () => {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
+    it('"method" param (function f) must be a @ngLock() decorated function.', () => {
         const f = () => { };
-        expect(function () { ngCallbacks(f, NG_UNLOCK_CALLBACK); }).toThrow(new Error('"fn" param (function f) must be a @ngLock() decorated function.'));
+        expect(function () { ngCallbacks(f, NG_UNLOCK_CALLBACK); }).toThrow(new Error('"method" param (function f) must be a @ngLock() decorated function.'));
     });
     it('"callback" param "TEST" must be a NG_CALLBACKS.', () => {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
         const f = () => { };
         expect(function () { ngCallbacks(f, 'TEST' as NG_CALLBACKS); }).toThrow(new Error('"callback" param "TEST" must be a NG_CALLBACKS.'));
     });

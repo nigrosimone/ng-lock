@@ -1,29 +1,14 @@
-import { Observable } from "rxjs";
+import { Observable, tap } from "rxjs";
 import { ngUnlock } from "./ng-lock.decorator";
+import { NgLockFunction } from "./ng-lock-types";
 
 /**
  * Un lock the method when Observable changes
- * @param methodToUnlock method to unlock
+ * @param {NgLockFunction} methodToUnlock method to unlock
+ * @returns {(source$: Observable<T>) => Observable<T>}
  */
-// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-export function ngLockChanges(methodToUnlock: Function) {
-    return function <T>(source: Observable<T>): Observable<T> {
-        return new Observable((subscriber) => {
-            const subscription = source.subscribe({
-                next(value) {
-                    subscriber.next(value);
-                    ngUnlock(methodToUnlock, 'Observable changes')
-                },
-                error(error) {
-                    subscriber.error(error);
-                    ngUnlock(methodToUnlock, 'Observable error')
-                },
-                complete() {
-                    subscriber.complete();
-                    ngUnlock(methodToUnlock, 'Observable complete')
-                }
-            })
-            return () => subscription.unsubscribe();
-        });
+export const ngLockChanges = <T>(methodToUnlock: NgLockFunction): (source$: Observable<T>) => Observable<T> => {
+    return (source$: Observable<T>): Observable<T> => {
+        return source$.pipe(tap(() => ngUnlock(methodToUnlock, 'Observable changes')));
     }
 }

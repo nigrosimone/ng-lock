@@ -6,3 +6,4 @@ export * from './lib/ng-lock-interceptor.service';
 export * from './lib/ng-lock-token';
 export * from './lib/ng-lock.module';
 export * from './lib/ng-lock-rxjs';
+export * from './lib/ng-lock-types';
