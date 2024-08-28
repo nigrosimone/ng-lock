@@ -70,7 +70,6 @@ const WAIT_TIME = 1500;
   selector: 'app-root',
   template: `
     <h2>Examples</h2>
-    <h2>Examples</h2>
     <p>Sometime there is a need to lock the user interface while a task is running.</p>
     <hr />
     Disable the button on click and enable when <b>ngUnlock</b> is called<br>
