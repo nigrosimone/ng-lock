@@ -4,8 +4,12 @@ Angular decorator for lock a function and user interface while a task running.
 
 ## Description
 
-Sometime there is a need to lock a function and the user interface while a task is running.
-This library expose a practical decorator that do it, in a simple way.
+Ever faced the issue where users click a button multiple times, causing chaos in your application? Meet `ng-lock`, the Angular library designed to save the day. It offers a straightforward way to lock functions and the user interface while a task is running.
+
+### Key Benefits:
+1. *Prevents Multiple Clicks*: Ensures a function executes only once until it completes, avoiding redundant operations;
+2. *User Interface Locking*: Disables UI elements to signal an ongoing process, enhancing user experience;
+3. *Easy Integration*: Simple decorators to lock and unlock functions, reducing boilerplate code.
 
 See the [stackblitz demo](https://stackblitz.com/edit/demo-ng-lock?file=src%2Fapp%2Fapp.component.ts).
 
@@ -66,6 +70,8 @@ const WAIT_TIME = 1500;
   selector: 'app-root',
   template: `
     <h2>Examples</h2>
+    <h2>Examples</h2>
+    <p>Sometime there is a need to lock the user interface while a task is running.</p>
     <hr />
     Disable the button on click and enable when <b>ngUnlock</b> is called<br>
     <button (click)="onClick($event)">Click me</button>
@@ -84,7 +90,10 @@ const WAIT_TIME = 1500;
     <button (click)="onSubscription($event)">Click me</button>
     <hr />
     Disable the button on click and enable when <b>unlockTimeout</b> expire<br>
-    <button (click)="onTimeout($event)">Click me</button>
+    <button (click)="onTimeout($event)">Click me</button><br>
+    This input also depends on the lock state, see <b>ngLock</b> directive <br>
+    <input type="text" [ngLock]="onTimeout" value="test">
+    <hr />
   `,
   styles: [`
     button.ng-lock-locked {
