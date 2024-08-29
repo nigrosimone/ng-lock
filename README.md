@@ -425,7 +425,7 @@ onClick(){
 }
 ```
 
-### ngUnlock(fn: Function): void
+### ngUnlock(methodToUnlock: NgLockFunction): void
 
 Unlock a locked function by `ngLock()` decorator. Usage, eg.:
 
@@ -436,7 +436,7 @@ onClick(){
   ngUnlock(this.onClick);
 }
 ```
-### ngIsLock(fn: Function): boolean
+### ngIsLock(methodToCheck: NgLockFunction): boolean
 
 Return `true` if the provided function is locked by `ngLock()` decorator. Usage, eg.:
 
@@ -448,9 +448,9 @@ onClick(){
 }
 ```
 
-### ngUnlockAll(self: any): void
+### ngUnlockAll(component: any): void
 
-Unlock all locked functions by `ngLock()` decorator. Argument `self` is the component instance (`this`). Usage, eg.:
+Unlock all locked functions by `ngLock()` decorator. Argument `component` is the component instance (`this`). Usage, eg.:
 
 ```ts
 @ngLock()
@@ -458,6 +458,22 @@ onClick(){
   // ...
   ngUnlockAll(this);
 }
+```
+
+### ngLockSignal(method: NgLockFunction): Signal<boolean>
+
+Return a Signal for the given function on the lock status (locked/unlocked), eg.:
+
+```ts
+public myMethodSignal: Signal<boolean> = ngLockSignal(this.myMethod);
+```
+
+### ngLockObservable(method: NgLockFunction): Observable<boolean>
+
+Return an Observable for the given function on the lock status (locked/unlocked), eg.:
+
+```ts
+public myMethod$: Observable<boolean> = ngLockObservable(this.myMethod);
 ```
 
 ## Examples
