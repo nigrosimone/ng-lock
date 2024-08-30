@@ -487,6 +487,20 @@ onClick(){
 }
 ```
 
+### withNgLockContext(methodToUnlock: NgLockFunction, context: HttpContext = new HttpContext()): HttpContext
+
+RxJS Operator that unlock the method when HTTP response, eg.:
+
+```ts
+@ngLock()
+onClick(){
+  this.http.get('https://my-json-server.typicode.com/typicode/demo/db', {
+    context: withNgLockContext(this.onClick),
+  }).subscribe();
+}
+```
+
+
 
 ## Examples
 
