@@ -420,7 +420,7 @@ Lock the provided function. Usage as decorator eg.:
 
 ```ts
 @ngLock()
-onClick(){
+onClick(event: MouseEvent){
   // ...
 }
 ```
@@ -431,7 +431,7 @@ Unlock a locked function by `ngLock()` decorator. Usage, eg.:
 
 ```ts
 @ngLock()
-onClick(){
+onClick(event: MouseEvent){
   // ...
   ngUnlock(this.onClick);
 }
@@ -442,7 +442,7 @@ Return `true` if the provided function is locked by `ngLock()` decorator. Usage,
 
 ```ts
 @ngLock()
-onClick(){
+onClick(event: MouseEvent){
   // ...
   console.log('onClick is locked?', ngIsLock(this.onClick) );
 }
@@ -454,7 +454,7 @@ Unlock all locked functions by `ngLock()` decorator. Argument `component` is the
 
 ```ts
 @ngLock()
-onClick(){
+onClick(event: MouseEvent){
   // ...
   ngUnlockAll(this);
 }
@@ -482,7 +482,7 @@ RxJS Operator that unlock the method when Observable changes, eg.:
 
 ```ts
 @ngLock()
-onClick(){
+onClick(event: MouseEvent) {
   of(true).pipe(ngLockChanges(this.onClick)).subscription();
 }
 ```
@@ -493,7 +493,7 @@ Return a HttpContext that unlock the method when HTTP respond, eg.:
 
 ```ts
 @ngLock()
-onClick(){
+onClick(event: MouseEvent) {
   this.http.get('https://my-json-server.typicode.com/typicode/demo/db', {
     context: withNgLockContext(this.onClick),
   }).subscribe();
