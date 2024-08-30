@@ -500,7 +500,19 @@ onClick(){
 }
 ```
 
+### ngLock directive
 
+The `ngLock` directive it's a Angular directive lock html element when a decorated method with `@ngLock` is running a task, eg.:
+
+```html
+<input [ngLock]="myMethod" /><button (click)="myMethod($event)">Send</button>
+```
+```ts
+@ngLock()
+myMethod(event: MouseEvent){
+  return new Promise(resolve => setTimeout(resolve, 5000));
+}
+```
 
 ## Examples
 
