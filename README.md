@@ -489,7 +489,7 @@ onClick(){
 
 ### withNgLockContext(methodToUnlock: NgLockFunction, context: HttpContext = new HttpContext()): HttpContext
 
-RxJS Operator that unlock the method when HTTP response, eg.:
+Return a HttpContext that unlock the method when HTTP respond, eg.:
 
 ```ts
 @ngLock()
