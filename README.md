@@ -476,6 +476,18 @@ Return an Observable for the given function on the lock status (locked/unlocked)
 public myMethod$: Observable<boolean> = ngLockObservable(this.myMethod);
 ```
 
+### ngLockChanges(methodToUnlock: NgLockFunction): (source$: Observable<T>) => Observable<T>
+
+RxJS Operator that unlock the method when Observable changes, eg.:
+
+```ts
+@ngLock()
+onClick(){
+  of(true).pipe(ngLockChanges(this.onClick)).subscription();
+}
+```
+
+
 ## Examples
 
 Below there are some examples of use case.
