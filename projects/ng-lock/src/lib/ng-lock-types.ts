@@ -10,6 +10,10 @@ export const NG_LOCK_OPTION = 'ngLockOption';
 export type NG_CALLBACKS = typeof NG_UNLOCK_CALLBACK | typeof NG_IS_LOCK_CALLBACK | typeof NG_LOCK_SIGNAL | typeof NG_LOCK_SUBJECT | typeof NG_LOCK_OPTION;
 export const NG_LOCK_LOCKED_CLASS = 'ng-lock-locked';
 
+/**
+ * All ngLock options
+ * @see NgLockOption
+ */
 export interface NgLockAllOption {
     maxCall: number,
     unlockTimeout: number | null;
