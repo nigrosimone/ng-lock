@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpClient } from '@angular/common/http';
 import { Component, Signal, ViewChild } from '@angular/core';
 import { ngLock, ngLockElementByComponentProperty, ngLockElementByQuerySelector, ngUnlock, withNgLockContext, ngLockChanges, ngLockSignal, ngLockObservable, ngUnlockAll } from 'projects/ng-lock/src/public-api';

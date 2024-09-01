@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { NgLockElementFinder, NgLockElementFunction } from "./ng-lock-types";
+import type { NgLockElementFinder, NgLockElementFunction } from "./ng-lock-types";
 
 /**
  * Uses the provided "selector" to find with "querySelector()" and apply the lockClass on the founded element.

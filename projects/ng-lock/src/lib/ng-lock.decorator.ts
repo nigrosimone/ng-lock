@@ -4,8 +4,6 @@ import { NG_IS_LOCK_CALLBACK, NG_LOCK_LOCKED_CLASS, NG_LOCK_OPTION, NG_LOCK_SIGN
 import { ngLockHtmlElement, ngUnLockHtmlElement } from "./ng-lock-utils";
 import { ngLockElementByTargetEventArgument } from "./ng-lock-element-finder";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 /**
  * ngLock default options
  * @see NgLockOption

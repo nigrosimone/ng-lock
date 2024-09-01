@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Signal } from "@angular/core";
 import { NG_CALLBACKS, NG_IS_LOCK_CALLBACK, NG_LOCK_OPTION, NG_LOCK_SIGNAL, NG_LOCK_SUBJECT, NG_UNLOCK_CALLBACK, NgLockAllOption, NgLockFunction, NgLockOption } from "./ng-lock-types";
 import { Observable } from "rxjs";
