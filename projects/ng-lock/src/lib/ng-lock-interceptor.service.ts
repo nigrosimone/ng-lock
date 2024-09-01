@@ -3,8 +3,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { NG_LOCK_CONTEXT } from './ng-lock-token';
-import { ngUnlock } from './ng-lock.decorator';
 import type { NgLockFunction } from './ng-lock-types';
+import { ngUnlock } from './ng-lock-utils';
 
 
 @Injectable()

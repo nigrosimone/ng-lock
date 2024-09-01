@@ -1,6 +1,6 @@
 import { Observable, tap } from "rxjs";
-import { ngUnlock } from "./ng-lock.decorator";
 import type { NgLockFunction } from "./ng-lock-types";
+import { ngUnlock } from "./ng-lock-utils";
 
 /**
  * Unlock the method when Observable changes

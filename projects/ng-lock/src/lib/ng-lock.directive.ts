@@ -1,7 +1,7 @@
 import { DestroyRef, Directive, ElementRef, Input, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NgLockFunction } from './ng-lock-types';
-import { ngLockHtmlElement, ngLockObservable, ngLockOption, ngUnLockHtmlElement } from './ng-lock.decorator';
+import { ngLockHtmlElement, ngLockObservable, ngLockOption, ngUnLockHtmlElement } from './ng-lock-utils';
 
 
 /**
