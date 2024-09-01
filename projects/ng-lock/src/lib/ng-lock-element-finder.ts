@@ -1,3 +1,4 @@
+import { ElementRef } from "@angular/core";
 import type { NgLockElementFinder, NgLockElementFunction } from "./ng-lock-types";
 
 /**
@@ -86,7 +87,7 @@ export const ngLockElementByComponentProperty: NgLockElementFunction = (property
             if (prop instanceof HTMLElement) {
                 return prop;
             }
-            if (prop.nativeElement instanceof HTMLElement) {
+            if ((prop as ElementRef<HTMLElement>).nativeElement instanceof HTMLElement) {
                 return prop.nativeElement;
             }
             throw new Error('Property must be a HTMLElement or object with nativeElement (also HTMLElement)');
