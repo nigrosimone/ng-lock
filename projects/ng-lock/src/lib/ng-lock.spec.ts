@@ -184,7 +184,7 @@ describe('NgLock Component', () => {
         expect(component.button.nativeElement.classList.contains(NG_LOCK_LOCKED_CLASS)).toBe(false);
     });
 
-    it('directive', () => {
+    it('directive', async() => {
         @Component({ template: '<button (click)="onClick()" #button>test</button><input #input [ngLock]="onClick">', standalone: true, imports: [NgLockModule] })
         class TestComponent {
             @ViewChild('button') button!: ElementRef<HTMLElement>;
@@ -203,6 +203,9 @@ describe('NgLock Component', () => {
         fixture.detectChanges();
         expect(component.button.nativeElement.classList.contains(NG_LOCK_LOCKED_CLASS)).toBe(true);
         expect(component.input.nativeElement.classList.contains(NG_LOCK_LOCKED_CLASS)).toBe(true);
+        await sleep(5);
+        expect(component.button.nativeElement.classList.contains(NG_LOCK_LOCKED_CLASS)).toBe(false);
+        expect(component.input.nativeElement.classList.contains(NG_LOCK_LOCKED_CLASS)).toBe(false);
     });
 });
 
