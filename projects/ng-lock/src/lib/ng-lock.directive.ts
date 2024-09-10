@@ -26,7 +26,8 @@ import { ngLockHtmlElement, ngLockObservable, ngLockOption, ngUnLockHtmlElement 
  * ```
  */
 @Directive({
-    selector: '[ngLock]'
+    selector: '[ngLock]',
+    standalone: true
 })
 export class NgLockDirective implements OnInit {
 

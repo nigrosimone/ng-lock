@@ -4,7 +4,7 @@ import { NgLockInterceptorService } from './ng-lock-interceptor.service';
 import { NgLockDirective } from './ng-lock.directive';
 
 @NgModule({
-  declarations: [NgLockDirective],
+  imports: [NgLockDirective],
   exports: [NgLockDirective],
   providers: [
     NgLockInterceptorService,

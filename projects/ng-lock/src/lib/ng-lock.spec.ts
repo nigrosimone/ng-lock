@@ -10,7 +10,6 @@ const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 describe('NgLock Component', () => {
     it('ngLockElementByQuerySelector', () => {
-
         @Component({ template: '<button (click)="onClick()" id="button" #button>{{value}}</button>', standalone: true, imports: [NgLockModule], })
         class TestComponent {
             @ViewChild('button') button!: ElementRef<HTMLElement>;
@@ -51,7 +50,6 @@ describe('NgLock Component', () => {
 
 
     it('ngLockElementByComponentProperty', () => {
-
         @Component({ template: '<button (click)="onClick()" #button>{{value}}</button>', standalone: true, imports: [NgLockModule] })
         class TestComponent {
             @ViewChild('button') button!: ElementRef<HTMLElement>;
@@ -89,7 +87,6 @@ describe('NgLock Component', () => {
 
 
     it('ngLockElementByTargetEventArgument', () => {
-
         @Component({ template: '<button (click)="onClick()" #button>{{value}}</button>', standalone: true, imports: [NgLockModule] })
         class TestComponent {
             @ViewChild('button') button!: ElementRef<HTMLElement>;
@@ -127,7 +124,6 @@ describe('NgLock Component', () => {
 
 
     it('unlockTimeout', async () => {
-
         @Component({ template: '<button (click)="onClick()" #button>{{value}}</button>', standalone: true, imports: [NgLockModule] })
         class TestComponent {
             @ViewChild('button') button!: ElementRef<HTMLElement>;
@@ -168,7 +164,6 @@ describe('NgLock Component', () => {
     });
 
     it('Promise', async () => {
-
         @Component({ template: '<button (click)="onClick()" #button>test</button>', standalone: true, imports: [NgLockModule] })
         class TestComponent {
             @ViewChild('button') button!: ElementRef<HTMLElement>;
@@ -187,6 +182,27 @@ describe('NgLock Component', () => {
         expect(component.button.nativeElement.classList.contains(NG_LOCK_LOCKED_CLASS)).toBe(true);
         await sleep(5);
         expect(component.button.nativeElement.classList.contains(NG_LOCK_LOCKED_CLASS)).toBe(false);
+    });
+
+    it('directive', () => {
+        @Component({ template: '<button (click)="onClick()" #button>test</button><input #input [ngLock]="onClick">', standalone: true, imports: [NgLockModule] })
+        class TestComponent {
+            @ViewChild('button') button!: ElementRef<HTMLElement>;
+            @ViewChild('input') input!: ElementRef<HTMLInputElement>;
+            @ngLock()
+            async onClick(_: any) {
+                await sleep(1);
+                return true;
+            }
+        }
+        const fixture = TestBed.createComponent(TestComponent);
+        fixture.detectChanges();
+        const component = fixture.componentInstance;
+
+        component.onClick({ target: component.button.nativeElement });
+        fixture.detectChanges();
+        expect(component.button.nativeElement.classList.contains(NG_LOCK_LOCKED_CLASS)).toBe(true);
+        expect(component.input.nativeElement.classList.contains(NG_LOCK_LOCKED_CLASS)).toBe(true);
     });
 });
 
