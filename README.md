@@ -28,7 +28,7 @@ import { importProvidersFrom } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { AppComponent } from './app/app.component';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-import { NgLockModule } from 'projects/ng-lock/src/public-api';
+import { NgLockModule } from 'ng-lock';
 
 bootstrapApplication(AppComponent, {
   providers: [
