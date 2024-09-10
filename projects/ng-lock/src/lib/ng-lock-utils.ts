@@ -1,6 +1,6 @@
 import { Signal } from "@angular/core";
 import { NG_CALLBACKS, NG_IS_LOCK_CALLBACK, NG_LOCK_OPTION, NG_LOCK_SIGNAL, NG_LOCK_SUBJECT, NG_UNLOCK_CALLBACK, NgLockAllOption, NgLockFunction, NgLockOption } from "./ng-lock-types";
-import { Observable } from "rxjs";
+import type { Observable, Subscriber } from "rxjs";
 
 /**
  * Unlock a locked function by ngLock() decorator
@@ -97,8 +97,11 @@ export function ngCallbacks(method: NgLockFunction, callback: NG_CALLBACKS): NgL
  * @param {Element} elementToLock 
  * @param {NgLockOption} options 
  */
-export const ngLockHtmlElement = (elementToLock: Element, options: NgLockOption) => {
-    if (options.lockClass) elementToLock.classList.add(options.lockClass);
+export const ngLockHtmlElement = (elementToLock: Element | null, options: NgLockOption) => {
+    if (!elementToLock) {
+        return;
+    }
+    if (options?.lockClass) elementToLock.classList.add(options.lockClass);
     elementToLock.setAttribute('disabled', 'disabled');
     elementToLock.setAttribute('aria-disabled', 'true');
 }
@@ -108,8 +111,21 @@ export const ngLockHtmlElement = (elementToLock: Element, options: NgLockOption)
  * @param {Element} elementToLock 
  * @param {NgLockOption} options 
  */
-export const ngUnLockHtmlElement = (elementToLock: Element, options: NgLockOption) => {
-    if (options.lockClass) elementToLock.classList.remove(options.lockClass);
+export const ngUnLockHtmlElement = (elementToLock: Element | null, options: NgLockOption) => {
+    if (!elementToLock) {
+        return;
+    }
+    if (options?.lockClass) elementToLock.classList.remove(options.lockClass);
     elementToLock.removeAttribute('disabled');
     elementToLock.removeAttribute('aria-disabled');
 }
+
+/**
+ * Check if value is a Promise
+ */
+export const isPromise = (value: any): value is Promise<unknown> => value && typeof value.finally === 'function' && typeof value.then === 'function' && value[Symbol.toStringTag] === 'Promise';
+
+/**
+ * Check if value is a destination partialObserver
+ */
+export const isObserver = (value: any): value is { destination: { partialObserver: Subscriber<unknown> } } => value && typeof value?.destination?.partialObserver === 'object';
