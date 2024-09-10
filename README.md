@@ -21,36 +21,27 @@ See the [stackblitz demo](https://stackblitz.com/edit/demo-ng-lock?file=src%2Fap
 npm i ng-lock
 ```
 
-*Step 2*: Import `NgLockModule` into your app module, eg.:
+*Step 2*: Import `NgLockModule` into your `bootstrapApplication`, eg.:
 
 ```ts
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
+import { importProvidersFrom } from '@angular/core';
+import { bootstrapApplication } from '@angular/platform-browser';
+import { AppComponent } from './app/app.component';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { NgLockModule } from 'projects/ng-lock/src/public-api';
 
-import { NgLockModule } from 'ng-lock';
-
-@NgModule({
-  declarations: [AppComponent],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    HttpClientModule,
-    NgLockModule,
-  ],
-  providers: [],
-  bootstrap: [AppComponent],
-  ],
-})
-export class AppModule { }
+bootstrapApplication(AppComponent, {
+  providers: [
+    importProvidersFrom(NgLockModule),
+    provideHttpClient(withInterceptorsFromDi())
+  ]
+});
 ```
 
 *Step 3*: Decorate a function with `@ngLock()` decorator, eg.:
 
 ```ts
-import { Component, isDevMode, Signal } from '@angular/core';
+import { Component, isDevMode, Signal, CommonModule } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { delay, Observable, of } from 'rxjs';
 import {
@@ -68,6 +59,8 @@ const WAIT_TIME = 1500;
 
 @Component({
   selector: 'app-root',
+  standalone: true,
+  imports: [NgLockModule, CommonModule],
   template: `
     <h2>Examples</h2>
     <p>Sometime there is a need to lock the user interface while a task is running.</p>
@@ -184,10 +177,12 @@ There are some optional options can be injected into the `@ngLock()` decorator. 
 
 ```ts
 import { Component } from '@angular/core';
-import { ngLock, ngUnlock } from 'ng-lock';
+import { ngLock, ngUnlock, NgLockModule } from 'ng-lock';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
+  imports: [NgLockModule],
   template: `<button (click)="onClick($event)">Click me!</button>`,
   styles: [`
     button.ng-lock-locked {
@@ -248,10 +243,12 @@ Uses the provided `selector` to find with `document.querySelector()` and apply t
 
 ```ts
 import { Component } from '@angular/core';
-import { ngLock, ngUnlock } from 'ng-lock';
+import { ngLock, ngUnlock, NgLockModule } from 'ng-lock';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
+  imports: [NgLockModule],
   template: `<button (click)="onClick()" class="my-class">Click me!</button>`,
   styles: [`
     button.ng-lock-locked {
@@ -288,10 +285,12 @@ Uses a function argument for apply the *lockClass*. If provided a `argsIndex` us
 
 ```ts
 import { Component } from '@angular/core';
-import { ngLock, ngUnlock } from 'ng-lock';
+import { ngLock, ngUnlock, NgLockModule } from 'ng-lock';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
+  imports: [NgLockModule],
   template: `<button (click)="onClick(1, $event)">Click me!</button>`,
   styles: [`
     button.ng-lock-locked {
@@ -328,10 +327,12 @@ Apply *lockClass* to a component property that must be a `HTMLElement` or elemen
 
 ```ts
 import { Component, ViewChild } from '@angular/core';
-import { ngLock, ngUnlock } from 'ng-lock';
+import { ngLock, ngUnlock, NgLockModule } from 'ng-lock';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
+  imports: [NgLockModule],
   template: `<button (click)="onClick()" #button>Click me!</button>`,
   styles: [`
     button.ng-lock-locked {
@@ -370,7 +371,7 @@ You can write a custom *lockElementFunction*. Eg.:
 
 ```ts
 import { Component } from '@angular/core';
-import { ngLock, ngUnlock, NgLockElementFunction, NgLockElementFinder } from 'ng-lock';
+import { ngLock, ngUnlock, NgLockElementFunction, NgLockElementFinder, NgLockModule } from 'ng-lock';
 
 const myLockElementFunction: NgLockElementFunction = (): NgLockElementFinder => {
   /**
@@ -384,6 +385,8 @@ const myLockElementFunction: NgLockElementFunction = (): NgLockElementFinder => 
 
 @Component({
   selector: 'app-root',
+  standalone: true,
+  imports: [NgLockModule],
   template: `<button (click)="onClick()" #button>Click me!</button>`,
   styles: [`
     button.ng-lock-locked {
@@ -524,10 +527,12 @@ Example of use with `unlockTimeout` option, eg.:
 
 ```ts
 import { Component } from '@angular/core';
-import { ngLock, ngIsLock } from 'ng-lock';
+import { ngLock, ngIsLock, NgLockModule } from 'ng-lock';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
+  imports: [NgLockModule],
   template: `
     <button (click)="onClick($event)">Click me!</button>
     <button (click)="onCheck()">Check</button>
@@ -564,10 +569,12 @@ Example of use with `maxCall` option, eg.:
 
 ```ts
 import { Component } from '@angular/core';
-import { ngLock, ngIsLock, ngUnlock } from 'ng-lock';
+import { ngLock, ngIsLock, ngUnlock, NgLockModule } from 'ng-lock';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
+  imports: [NgLockModule],
   template: `
     <button (click)="onClick($event)">Click me!</button>
     <button (click)="onCheck()">Check</button>

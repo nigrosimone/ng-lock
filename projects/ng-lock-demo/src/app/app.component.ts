@@ -1,6 +1,7 @@
+import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, Signal, ViewChild } from '@angular/core';
-import { ngLock, ngLockElementByComponentProperty, ngLockElementByQuerySelector, ngUnlock, withNgLockContext, ngLockChanges, ngLockSignal, ngLockObservable, ngUnlockAll } from 'projects/ng-lock/src/public-api';
+import { ngLock, ngLockElementByComponentProperty, ngLockElementByQuerySelector, ngUnlock, withNgLockContext, ngLockChanges, ngLockSignal, ngLockObservable, ngUnlockAll, NgLockModule } from 'projects/ng-lock/src/public-api';
 import { delay, Observable } from 'rxjs';
 
 const sleep = (time: number) => new Promise(resolve => setTimeout(resolve, time));
@@ -8,14 +9,16 @@ const sleep = (time: number) => new Promise(resolve => setTimeout(resolve, time)
   // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
+  standalone: true,
+  imports: [NgLockModule, CommonModule]
 })
 export class AppComponent {
   @ViewChild("button3") button3 = null;
 
   public sigPromiseMethod: Signal<boolean> = ngLockSignal(this.promiseMethod);
   public promiseMethod$: Observable<boolean> = ngLockObservable(this.promiseMethod);
-  
+
   constructor(private http: HttpClient) { }
 
   @ngLock({ debug: true })
@@ -153,13 +156,13 @@ export class AppComponent {
       .pipe(delay(1000))
       .subscribe(response => console.log(this.subscriptionCompleted.name, response))
   }
-  
+
   @ngLock({ debug: true })
-  onNoUnlock(_: MouseEvent){
+  onNoUnlock(_: MouseEvent) {
 
   }
 
-  onNgUnlockAll(){
+  onNgUnlockAll() {
     ngUnlockAll(this)
   }
 }
