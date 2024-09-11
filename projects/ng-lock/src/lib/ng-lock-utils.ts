@@ -23,7 +23,9 @@ export function ngUnlockAll(component: any): void {
     Object.getOwnPropertyNames(Object.getPrototypeOf(component)).forEach(key => {
         const prop = component[key];
         if (typeof prop === 'function' && typeof prop['ngLock'] === 'object' && typeof prop['ngLock'][NG_UNLOCK_CALLBACK] === 'function') {
-            prop['ngLock'][NG_UNLOCK_CALLBACK]('ngUnlockAll');
+            if (prop['ngLock'][NG_IS_LOCK_CALLBACK]()) {
+                prop['ngLock'][NG_UNLOCK_CALLBACK]('ngUnlockAll');
+            }
         }
     });
 }
