@@ -103,7 +103,7 @@ export function ngLock(options?: NgLockOption): MethodDecorator {
             ngLockLog(`NgLock: execute method "${key.toString()}"`);
 
             if (_options.unlockOnPromiseResolve && isPromise(lastResult)) {
-                (lastResult as Promise<unknown>).finally(() => ngUnlockCallback('Promise resolved'));
+                lastResult.finally(() => ngUnlockCallback('Promise resolved'));
             } else if (_options.unlockOnObservableChanges && isObserver(lastResult)) {
                 const obsNext = lastResult.destination.partialObserver.next;
                 if (typeof obsNext === 'function') {
