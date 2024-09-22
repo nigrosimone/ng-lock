@@ -10,3 +10,4 @@ export * from './lib/ng-lock-types';
 export * from './lib/ng-lock.directive';
 export * from './lib/ng-lock-utils';
 export * from './lib/ng-lock-element-finder';
+export * from './lib/ng-lock-provider';

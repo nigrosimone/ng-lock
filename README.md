@@ -21,18 +21,18 @@ See the [stackblitz demo](https://stackblitz.com/edit/demo-ng-lock?file=src%2Fap
 npm i ng-lock
 ```
 
-*Step 2*: Import `NgLockModule` into your `bootstrapApplication`, eg.:
+*Step 2*: Provide `NgLock` into your `bootstrapApplication`, eg.:
 
 ```ts
 import { importProvidersFrom } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { AppComponent } from './app/app.component';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-import { NgLockModule } from 'ng-lock';
+import { provideNgLock } from 'ng-lock';
 
 bootstrapApplication(AppComponent, {
   providers: [
-    importProvidersFrom(NgLockModule),
+    provideNgLock(),
     provideHttpClient(withInterceptorsFromDi())
   ]
 });
