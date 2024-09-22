@@ -24,7 +24,6 @@ npm i ng-lock
 *Step 2*: Provide `NgLock` into your `bootstrapApplication`, eg.:
 
 ```ts
-import { importProvidersFrom } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { AppComponent } from './app/app.component';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
