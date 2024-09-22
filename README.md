@@ -59,7 +59,6 @@ const WAIT_TIME = 1500;
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   imports: [NgLockDirective, CommonModule],
   template: `
     <h2>Examples</h2>
@@ -181,7 +180,6 @@ import { ngLock, ngUnlock } from 'ng-lock';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   template: `<button (click)="onClick($event)">Click me!</button>`,
   styles: [`
     button.ng-lock-locked {
@@ -246,7 +244,6 @@ import { ngLock, ngUnlock } from 'ng-lock';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   template: `<button (click)="onClick()" class="my-class">Click me!</button>`,
   styles: [`
     button.ng-lock-locked {
@@ -287,7 +284,6 @@ import { ngLock, ngUnlock } from 'ng-lock';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   template: `<button (click)="onClick(1, $event)">Click me!</button>`,
   styles: [`
     button.ng-lock-locked {
@@ -328,7 +324,6 @@ import { ngLock, ngUnlock } from 'ng-lock';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   template: `<button (click)="onClick()" #button>Click me!</button>`,
   styles: [`
     button.ng-lock-locked {
@@ -381,7 +376,6 @@ const myLockElementFunction: NgLockElementFunction = (): NgLockElementFinder => 
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   template: `<button (click)="onClick()" #button>Click me!</button>`,
   styles: [`
     button.ng-lock-locked {
@@ -508,7 +502,6 @@ import { ngLock, NgLockDirective } from 'ng-lock';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   imports: [NgLockDirective],
   template: `
     <input [ngLock]="myMethod" /><button (click)="myMethod($event)">Send</button>
@@ -536,7 +529,6 @@ import { ngLock, ngIsLock } from 'ng-lock';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   template: `
     <button (click)="onClick($event)">Click me!</button>
     <button (click)="onCheck()">Check</button>
@@ -577,7 +569,6 @@ import { ngLock, ngIsLock, ngUnlock } from 'ng-lock';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   template: `
     <button (click)="onClick($event)">Click me!</button>
     <button (click)="onCheck()">Check</button>
