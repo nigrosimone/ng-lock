@@ -10,7 +10,6 @@ const sleep = (time: number) => new Promise(resolve => setTimeout(resolve, time)
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  standalone: true,
   imports: [NgLockModule, CommonModule]
 })
 export class AppComponent {
