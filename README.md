@@ -40,7 +40,7 @@ bootstrapApplication(AppComponent, {
 *Step 3*: Decorate a function with `@ngLock()` decorator, eg.:
 
 ```ts
-import { Component, isDevMode, Signal, CommonModule } from '@angular/core';
+import { Component, isDevMode, Signal, CommonModule, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { delay, Observable, of } from 'rxjs';
 import {
@@ -96,14 +96,13 @@ const WAIT_TIME = 1500;
   `]
 })
 export class AppComponent {
+  private readonly http = inject(HttpClient);
 
   // if you want more control over the lock status of a decorated method,
   // you can get a Signal and/or an Observable of a given method,
   // the status: when true is locked; when false is unlocked.
   public sigAsyncMethod: Signal<boolean> = ngLockSignal(this.onAsync);
   public asyncMethod$: Observable<boolean> = ngLockObservable(this.onAsync);
-  
-  constructor(private http: HttpClient) { }
 
   /**
    * @ngLock() apply "ng-lock-locked" class on first call and remove it on `ngUnlock(this.onClick)`
